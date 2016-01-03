@@ -8,8 +8,8 @@ var {
 module.exports = React.createClass({
   render: function() {
     return (
-      <TouchableHighlight style={styles.button} underlayColor={'gray'} onPress={this.props.onPress}>
-        <Text style={styles.buttonText}>{this.props.text}</Text>
+      <TouchableHighlight style={[styles.button, this.props.buttonType]} underlayColor={'gray'} onPress={this.props.onPress}>
+        <Text style={[styles.buttonText, this.props.textType]}>{this.props.text}</Text>
       </TouchableHighlight>
     )
   }
@@ -23,7 +23,8 @@ var styles = StyleSheet.create({
     borderRadius: 3,
     padding: 5,
     borderColor: 'black',
-    marginTop: 10
+    marginTop: 10,
+    marginBottom: 10
   },
 
   buttonText: {
