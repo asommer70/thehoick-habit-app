@@ -1,0 +1,3 @@
+rootProject.name = 'thehoick_habit_app'
+
+include ':app'
