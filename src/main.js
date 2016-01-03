@@ -14,45 +14,21 @@ var Button = require('./components/button');
 
 module.exports = React.createClass({
   componentDidMount() {
-    // this._loadInitialState().done();
-    // var habit = AsyncStorage.getItem('habit', (habit) => {
-    //   this.setState({habit: habit})
-    // });
-    console.log('this.state.habit:', this.state.habit);
     store.get('habit').then((data) => {
-      console.log('data:', data);
-
       if (this.isMounted()) {
         this.setState({habit: data, editHabit: false});
       }
     });
   },
-  //
-  // async _loadInitialState() {
-  //   try {
-  //     var value = await AsyncStorage.getItem('habit');
-  //     if (value !== null){
-  //       this.setState({habit: value});
-  //       this._appendMessage('Recovered selection from disk: ' + value);
-  //     } else {
-  //       this._appendMessage('Initialized with no selection on disk.');
-  //     }
-  //   } catch (error) {
-  //     this._appendMessage('AsyncStorage error: ' + error.message);
-  //   }
-  // },
 
   getInitialState: function() {
     return {
       habit: '',
       editHabit: true,
-      // messages: [],
     }
   },
 
   saveHabit: function() {
-    console.log('Button pressed...');
-
     if (this.state.text) {
       store.save('habit', this.state.text).then(() => {
         this.setState({habit: this.state.text, editHabit: false});
@@ -60,28 +36,14 @@ module.exports = React.createClass({
     } else {
       this.setState({editHabit: false});
     }
-
-
-
-    // this.setState({habit: this.state.habit});
-    // try {
-    //   await AsyncStorage.setItem('habit', this.state.habit);
-    //   this._appendMessage('Saved selection to disk: ' + this.state.habit);
-    // } catch (error) {
-    //   this._appendMessage('AsyncStorage error: ' + error.message);
-    // }
-
   },
 
   editHabit: function() {
-    console.log('Long press...');
     this.setState({editHabit: true})
   },
 
   render: function() {
     var input, save;
-
-    console.log('this.state.habit:', this.state.habit);
 
     if (this.state.editHabit !== true) {
       label = <Text></Text>;
@@ -104,20 +66,6 @@ module.exports = React.createClass({
       </View>
     )
   },
-
-  // async _onValueChange(selectedValue) {
-  //   this.setState({selectedValue});
-  //   try {
-  //     await AsyncStorage.setItem(STORAGE_KEY, selectedValue);
-  //     this._appendMessage('Saved selection to disk: ' + selectedValue);
-  //   } catch (error) {
-  //     this._appendMessage('AsyncStorage error: ' + error.message);
-  //   }
-  // },
-  //
-  // _appendMessage(message) {
-  //   this.setState({messages: this.state.messages.concat(message)});
-  // },
 });
 
 var styles = StyleSheet.create({
