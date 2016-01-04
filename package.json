@@ -8,6 +8,7 @@
   "dependencies": {
     "react-native": "^0.17.0",
     "react-native-calendar": "^0.6.2",
+    "react-native-share": "^1.0.4",
     "react-native-simple-store": "^0.1.0"
   }
 }

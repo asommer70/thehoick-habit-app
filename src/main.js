@@ -10,6 +10,7 @@ var {
   ScrollView
 } = React;
 var store = require('react-native-simple-store');
+var Share = require('react-native-share');
 
 var Button = require('./components/button');
 
@@ -104,6 +105,16 @@ module.exports = React.createClass({
     this.setState({days: [], editHabit: false, checked: false});
   },
 
+  onShare: function() {
+    Share.open({
+      share_text: "Hola mundo",
+      share_URL: "http://google.cl",
+      title: "Share Link"
+    },function(e) {
+      console.log(e);
+    });
+  },
+
   render: function() {
     var input, save;
 
@@ -138,11 +149,18 @@ module.exports = React.createClass({
 
         <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
           <View style={styles.chains}>
-            {this.state.days.map(function(day) {
-              return <Image key={day.dayId} style={styles.icon} source={require('./img/chain-icon.png')} />;
+            {this.state.days.map(function(day, index) {
+              return <Image key={day.dayId} style={styles.icon}
+                      source={index % 30 == 0 && index != 0 ? require('./img/chain-icon-green.png') : require('./img/chain-icon.png')} />;
             })}
           </View>
         </ScrollView>
+
+        <TouchableHighlight onPress={this.onShare}>
+          <Text  style={styles.instructions}>
+            Share
+          </Text>
+        </TouchableHighlight>
       </View>
     )
   },
@@ -152,6 +170,7 @@ var styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: '#045491',
   },
 
   wrapper: {
@@ -166,34 +185,37 @@ var styles = StyleSheet.create({
     padding: 20,
     fontSize: 35,
     borderWidth: 2,
-    borderColor: 'black',
+    borderColor: '#DFD9B9',
+    color: '#DFD9B9'
   },
 
   input: {
     padding: 4,
     height: 40,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: '#424242',
     borderRadius: 3,
     margin: 5,
     width: 200,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
 
   formElement: {
     backgroundColor: '#eeeeee',
-    margin: 10
+    margin: 10,
   },
 
   label: {
     alignSelf: 'center',
     justifyContent: 'center',
     fontSize: 18,
-    marginTop: 10
+    marginTop: 10,
   },
 
   days: {
-    padding: 10
+    padding: 10,
+    color: '#DFD9B9',
+    fontSize: 16
   },
 
   icon: {
@@ -213,15 +235,21 @@ var styles = StyleSheet.create({
   },
 
   checked: {
-    backgroundColor: 'green',
-    color: 'white'
+    backgroundColor: '#4D9E7E',
+    color: '#DFD9B9'
   },
 
   restartButton: {
-    borderColor: 'red',
+    borderColor: '#CE4B41',
   },
 
   restartText: {
-    color: 'red',
+    color: '#CE4B41',
+  },
+
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
   },
 });

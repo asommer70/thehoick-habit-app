@@ -22,14 +22,15 @@ var styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 3,
     padding: 5,
-    borderColor: 'black',
+    borderColor: '#424242',
     marginTop: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   buttonText: {
     flex: 1,
     alignSelf: 'center',
-    fontSize: 20
+    fontSize: 20,
+    color: '#424242'
   }
 });
