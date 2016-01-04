@@ -120,10 +120,10 @@ module.exports = React.createClass({
     var input, save;
 
     if (this.state.editHabit !== true) {
-      label = <Text></Text>;
-      input = <Text></Text>;
-      save = <Text></Text>;
-      restart = <Text></Text>;
+      label = <View></View>;
+      input = <View></View>;
+      save = <View></View>;
+      restart = <View></View>;
     } else {
       label = <Text style={styles.label}>Enter Habit</Text>;
       input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text})} value={this.state.habit} />;

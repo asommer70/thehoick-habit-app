@@ -13,7 +13,7 @@ module.exports = React.createClass({
     if (this.props.imageSrc) {
       image = <Image source={this.props.imageSrc} style={styles.shareIcon} />;
     } else {
-      image = <Text></Text>;
+      image = <View></View>;
     }
 
     return (
