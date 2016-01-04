@@ -7,7 +7,7 @@ var {
   AsyncStorage,
   TouchableWithoutFeedback,
   Image,
-  ListView
+  ScrollView
 } = React;
 var store = require('react-native-simple-store');
 
@@ -30,7 +30,13 @@ module.exports = React.createClass({
     // Get the days array from AsyncStorage, and check if today has been checked.
     store.get('days').then((data) => {
       if (this.isMounted()) {
-        this.setState({days: data});
+        //this.setState({days: data});
+        var thirty = [];
+        for (var i = 0; i < 32; i++) {
+          var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
+          thirty.push(newDay);
+        }
+        this.setState({days: thirty});
       }
 
       day = data.findIndex(function(day, index, days) {
@@ -46,6 +52,7 @@ module.exports = React.createClass({
   },
 
   getInitialState: function() {
+
     return {
       habit: '',
       checked: false,
@@ -114,24 +121,28 @@ module.exports = React.createClass({
 
     return (
       <View style={styles.container}>
-        <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
-          <Text style={[styles.habit, this.state.checked && styles.checked]}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
-        </TouchableWithoutFeedback>
+        <View style={styles.wrapper}>
+          <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
+            <Text style={[styles.habit, this.state.checked && styles.checked]}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
+          </TouchableWithoutFeedback>
 
-        <View style={styles.formElement}>
-          {label}
-          {input}
-          {save}
-          {restart}
+          <View style={styles.formElement}>
+            {label}
+            {input}
+            {save}
+            {restart}
+          </View>
+
+          <Text style={styles.days}>{this.state.days ? this.state.days.length : '0'} links in the chain.</Text>
         </View>
 
-        <Text style={styles.days}>{this.state.days ? this.state.days.length : '0'} links in the chain.</Text>
-
-        <View style={styles.chains}>
-          {this.state.days.map(function(day) {
-            return <Image key={day.dayId} style={styles.icon} source={require('./img/chain-icon.png')} />;
-          })}
-        </View>
+        <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
+          <View style={styles.chains}>
+            {this.state.days.map(function(day) {
+              return <Image key={day.dayId} style={styles.icon} source={require('./img/chain-icon.png')} />;
+            })}
+          </View>
+        </ScrollView>
       </View>
     )
   },
@@ -140,6 +151,11 @@ module.exports = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+  },
+
+  wrapper: {
+    marginTop: 120,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -184,12 +200,21 @@ var styles = StyleSheet.create({
     padding: 0,
   },
 
+  scroll: {
+    height: 300,
+  },
+
   chains: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingLeft: 5,
+    paddingRight: 5,
+    overflow: 'visible',
   },
 
   checked: {
-    backgroundColor: 'green'
+    backgroundColor: 'green',
+    color: 'white'
   },
 
   restartButton: {
