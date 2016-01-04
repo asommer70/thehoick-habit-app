@@ -7,7 +7,8 @@ var {
   AsyncStorage,
   TouchableWithoutFeedback,
   Image,
-  ScrollView
+  ScrollView,
+  TouchableHighlight
 } = React;
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
@@ -33,7 +34,7 @@ module.exports = React.createClass({
       if (this.isMounted()) {
         //this.setState({days: data});
         var thirty = [];
-        for (var i = 0; i < 32; i++) {
+        for (var i = 0; i < 365; i++) {
           var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
           thirty.push(newDay);
         }
@@ -107,9 +108,9 @@ module.exports = React.createClass({
 
   onShare: function() {
     Share.open({
-      share_text: "Hola mundo",
-      share_URL: "http://google.cl",
-      title: "Share Link"
+      share_text: 'Habit Progress',
+      share_URL: 'For my ' + this.state.habit + ' habit I have done ' + this.state.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
+      title: 'For my ' + this.state.habit + ' habit I have done ' + this.state.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
     },function(e) {
       console.log(e);
     });
@@ -134,7 +135,9 @@ module.exports = React.createClass({
       <View style={styles.container}>
         <View style={styles.wrapper}>
           <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
-            <Text style={[styles.habit, this.state.checked && styles.checked]}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
+            <View style={[styles.habit, this.state.checked && styles.checked]}>
+              <Text style={styles.habitText}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
+            </View>
           </TouchableWithoutFeedback>
 
           <View style={styles.formElement}>
@@ -156,11 +159,7 @@ module.exports = React.createClass({
           </View>
         </ScrollView>
 
-        <TouchableHighlight onPress={this.onShare}>
-          <Text  style={styles.instructions}>
-            Share
-          </Text>
-        </TouchableHighlight>
+        <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
       </View>
     )
   },
@@ -174,7 +173,7 @@ var styles = StyleSheet.create({
   },
 
   wrapper: {
-    marginTop: 120,
+    marginTop: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -183,10 +182,17 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    fontSize: 35,
     borderWidth: 2,
     borderColor: '#DFD9B9',
+  },
+
+  habitText: {
+    fontSize: 35,
     color: '#DFD9B9'
+  },
+
+  checked: {
+    backgroundColor: '#4D9E7E',
   },
 
   input: {
@@ -202,7 +208,7 @@ var styles = StyleSheet.create({
 
   formElement: {
     backgroundColor: '#eeeeee',
-    margin: 10,
+    margin: 5,
   },
 
   label: {
@@ -223,20 +229,16 @@ var styles = StyleSheet.create({
   },
 
   scroll: {
-    height: 300,
+    height: 600,
   },
 
   chains: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingLeft: 5,
-    paddingRight: 5,
+    padding: 5,
     overflow: 'visible',
-  },
-
-  checked: {
-    backgroundColor: '#4D9E7E',
-    color: '#DFD9B9'
+    borderColor: '#DFD9B9',
+    borderWidth: 1
   },
 
   restartButton: {
@@ -247,9 +249,25 @@ var styles = StyleSheet.create({
     color: '#CE4B41',
   },
 
-  instructions: {
+  share: {
+    marginBottom: 15,
+    marginTop: 15,
+    paddingTop: 5,
+    borderColor: '#DFD9B9',
+    borderWidth: 1,
+    width: 45,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+
+  shareButton: {
+    borderColor: '#DFD9B9',
+    borderRadius: 0
+  },
+
+  shareText: {
     textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+    color: '#DFD9B9',
+    paddingTop: 2
   },
 });

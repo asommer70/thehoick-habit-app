@@ -2,14 +2,26 @@ var React = require('react-native');
 var {
   Text,
   StyleSheet,
-  TouchableHighlight
+  TouchableHighlight,
+  Image,
+  View
 } = React;
 
 module.exports = React.createClass({
   render: function() {
+    var image;
+    if (this.props.imageSrc) {
+      image = <Image source={this.props.imageSrc} style={styles.shareIcon} />;
+    } else {
+      image = <Text></Text>;
+    }
+
     return (
       <TouchableHighlight style={[styles.button, this.props.buttonType]} underlayColor={'gray'} onPress={this.props.onPress}>
-        <Text style={[styles.buttonText, this.props.textType]}>{this.props.text}</Text>
+        <View>
+          {image}
+          <Text style={[styles.buttonText, this.props.textType]}>{this.props.text}</Text>
+        </View>
       </TouchableHighlight>
     )
   }
@@ -32,5 +44,12 @@ var styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 20,
     color: '#424242'
+  },
+
+  shareIcon: {
+    padding: 5,
+    paddingBottom: 7,
+    alignSelf: 'center',
+    justifyContent: 'center',
   }
 });
