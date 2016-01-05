@@ -32,11 +32,9 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     borderWidth: 1,
-    borderRadius: 3,
     padding: 5,
     borderColor: '#424242',
-    marginTop: 10,
-    marginBottom: 10,
+    margin: 10
   },
 
   buttonText: {

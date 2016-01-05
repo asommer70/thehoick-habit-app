@@ -32,13 +32,17 @@ module.exports = React.createClass({
     // Get the days array from AsyncStorage, and check if today has been checked.
     store.get('days').then((data) => {
       if (this.isMounted()) {
-        //this.setState({days: data});
-        var thirty = [];
-        for (var i = 0; i < 365; i++) {
-          var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
-          thirty.push(newDay);
-        }
-        this.setState({days: thirty});
+        this.setState({days: data});
+
+        //
+        // Populate the days with test data.
+        //
+        // var thirty = [];
+        // for (var i = 0; i < 365; i++) {
+        //   var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
+        //   thirty.push(newDay);
+        // }
+        // this.setState({days: thirty});
       }
 
       day = data.findIndex(function(day, index, days) {
@@ -106,6 +110,10 @@ module.exports = React.createClass({
     this.setState({days: [], editHabit: false, checked: false});
   },
 
+  cancelHabitEdit: function() {
+    this.setState({editHabit: false});
+  },
+
   onShare: function() {
     Share.open({
       share_text: 'Habit Progress',
@@ -123,27 +131,34 @@ module.exports = React.createClass({
       label = <View></View>;
       input = <View></View>;
       save = <View></View>;
+      cancel = <View></View>;
       restart = <View></View>;
     } else {
       label = <Text style={styles.label}>Enter Habit</Text>;
       input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text})} value={this.state.habit} />;
-      save =  <Button text={'Save'} onPress={this.saveHabit} />;
+      save =  <Button text={'Save'} onPress={this.saveHabit} textType={styles.saveText} buttonType={styles.saveButton} />;
+      cancel =  <Button text={'Cancel'} onPress={this.cancelHabitEdit} />;
       restart = <Button text={'Restart Chain'} onPress={this.restartHabit} textType={styles.restartText} buttonType={styles.restartButton} />;
     }
 
     return (
       <View style={styles.container}>
         <View style={styles.wrapper}>
-          <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
-            <View style={[styles.habit, this.state.checked && styles.checked]}>
-              <Text style={styles.habitText}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
-            </View>
-          </TouchableWithoutFeedback>
+          <View style={styles.shadow}>
+            <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
+              <View style={[styles.habit, this.state.checked && styles.checked]}>
+                <Text style={styles.habitText}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
 
           <View style={styles.formElement}>
             {label}
             {input}
-            {save}
+            <View style={styles.editButtons}>
+              {save}
+              {cancel}
+            </View>
             {restart}
           </View>
 
@@ -184,6 +199,13 @@ var styles = StyleSheet.create({
     padding: 20,
     borderWidth: 2,
     borderColor: '#DFD9B9',
+  },
+
+  shadow: {
+    shadowColor: '#424242',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.7,
+    shadowRadius: 3,
   },
 
   habitText: {
@@ -247,6 +269,21 @@ var styles = StyleSheet.create({
 
   restartText: {
     color: '#CE4B41',
+  },
+
+  saveButton: {
+    borderColor: '#4D9E7E',
+  },
+
+  saveText: {
+    color: '#4D9E7E',
+  },
+
+  editButtons: {
+    flexDirection: 'row',
+    flex: 2,
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
 
   share: {
