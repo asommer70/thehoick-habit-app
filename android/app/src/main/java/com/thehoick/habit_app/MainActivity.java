@@ -1,4 +1,4 @@
-package com.thehoick_habit_app;
+package com.thehoick.habit_app;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -33,7 +33,7 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
 
-        mReactRootView.startReactApplication(mReactInstanceManager, "thehoick_habit_app", null);
+        mReactRootView.startReactApplication(mReactInstanceManager, "thehoick.habit_app", null);
 
         setContentView(mReactRootView);
     }
