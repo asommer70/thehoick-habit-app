@@ -24,13 +24,21 @@ module.exports = React.createClass({
   componentDidMount() {
     // Get the habit from AsyncStorage.
     store.get('habit').then((data) => {
+      if (data === null || data === undefined) {
+        store.save('habit', '');
+      }
+
       if (this.isMounted()) {
-        this.setState({habit: data, editHabit: false});
+        this.setState({habit: data, editHabit: false, text: data});
       }
     });
 
     // Get the days array from AsyncStorage, and check if today has been checked.
     store.get('days').then((data) => {
+      if (data === null || data === undefined) {
+        store.save('days', []);
+      }
+
       if (this.isMounted()) {
         this.setState({days: data});
 
@@ -82,26 +90,30 @@ module.exports = React.createClass({
   },
 
   addDay: function() {
-    if (this.state.days !== null) {
-      day = this.state.days.findIndex(function(day, index, days) {
-        if (day.dayId == dayKey) {
-          return true;
-        }
-      });
-    } else {
-      day = -1;
-    }
-
-    if (day === -1) {
-      var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit};
-
-      if (this.state.days === null) {
-        this.setState({days: [newDay], checked: true});
+    if (this.state.habit) {
+      if (this.state.days !== null) {
+        day = this.state.days.findIndex(function(day, index, days) {
+          if (day.dayId == dayKey) {
+            return true;
+          }
+        });
       } else {
-        this.state.days.push(newDay);
-        this.setState({days: this.state.days, checked: true});
+        day = -1;
       }
-      store.save('days', this.state.days);
+
+      if (day === -1) {
+        var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit};
+
+        if (this.state.days === null) {
+          this.setState({days: [newDay], checked: true});
+        } else {
+          this.state.days.push(newDay);
+          this.setState({days: this.state.days, checked: true});
+        }
+        store.save('days', this.state.days);
+      }
+    } else {
+      this.setState({editHabit: true});
     }
   },
 
@@ -135,10 +147,22 @@ module.exports = React.createClass({
       restart = <View></View>;
     } else {
       label = <Text style={styles.label}>Enter Habit</Text>;
-      input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text})} value={this.state.habit} />;
+      input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text})} value={this.state.text} />;
       save =  <Button text={'Save'} onPress={this.saveHabit} textType={styles.saveText} buttonType={styles.saveButton} />;
       cancel =  <Button text={'Cancel'} onPress={this.cancelHabitEdit} />;
       restart = <Button text={'Restart Chain'} onPress={this.restartHabit} textType={styles.restartText} buttonType={styles.restartButton} />;
+    }
+
+    var chains;
+    if (this.state.habit) {
+      chains =  <View style={styles.chains}>
+                  {this.state.days.map(function(day, index) {
+                    return <Image key={day.dayId} style={styles.icon}
+                            source={index % 30 == 0 && index != 0 ? require('./img/chain-icon-green.png') : require('./img/chain-icon.png')} />;
+                  })}
+                </View>
+    } else {
+      chains = <View></View>;
     }
 
     return (
@@ -162,16 +186,11 @@ module.exports = React.createClass({
             {restart}
           </View>
 
-          <Text style={styles.days}>{this.state.days ? this.state.days.length : '0'} links in the chain.</Text>
+          <Text style={styles.days}>{this.state.days ? this.state.days.length : '0'} link{this.state.days.length == 1 ? '' : 's'} in the chain.</Text>
         </View>
 
         <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
-          <View style={styles.chains}>
-            {this.state.days.map(function(day, index) {
-              return <Image key={day.dayId} style={styles.icon}
-                      source={index % 30 == 0 && index != 0 ? require('./img/chain-icon-green.png') : require('./img/chain-icon.png')} />;
-            })}
-          </View>
+         {chains}
         </ScrollView>
 
         <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
