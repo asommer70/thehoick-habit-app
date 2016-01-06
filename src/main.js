@@ -17,71 +17,132 @@ var Button = require('./components/button');
 
 var today = new Date();
 var dayKey = today.getMonth().toString() + today.getDate().toString() + today.getFullYear().toString();
+var yesterdayKey = today.getMonth().toString() + (today.getDate() - 1).toString() + today.getFullYear().toString();
 var day;
 
 
 module.exports = React.createClass({
   componentDidMount() {
-    // Get the habit from AsyncStorage.
-    store.get('habit').then((data) => {
-      if (data === null || data === undefined) {
-        store.save('habit', '');
+    // Get the habits from AsyncStorage and set the current habit to the last one.
+    store.get('habits').then((data) => {
+      console.log('habits data:', data);
+
+      var habit;
+      var checked = false;
+
+      if (data === null || data === undefined || data.length == 0) {
+        data = [];
+        habit = {name: '', days: []};
+        store.save('habits', []);
+      } else {
+        habit = data[data.length - 1];
+
+        day = habit.days.findIndex(function(day, index, days) {
+          if (day.dayId == dayKey) {
+            return true;
+          }
+        });
+
+        if (day !== -1) {
+          checked = true;
+        }
       }
 
       if (this.isMounted()) {
-        this.setState({habit: data, editHabit: false, text: data});
+        this.setState({habit: habit, habits: data, editHabit: false, text: habit.name, checked: checked});
       }
     });
 
     // Get the days array from AsyncStorage, and check if today has been checked.
-    store.get('days').then((data) => {
-      if (data === null || data === undefined) {
-        store.save('days', []);
-      }
-
-      if (this.isMounted()) {
-        this.setState({days: data});
-
-        //
-        // Populate the days with test data.
-        //
-        // var thirty = [];
-        // for (var i = 0; i < 365; i++) {
-        //   var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
-        //   thirty.push(newDay);
-        // }
-        // this.setState({days: thirty});
-      }
-
-      day = data.findIndex(function(day, index, days) {
-        if (day.dayId == dayKey) {
-          return true;
-        }
-      });
-
-      if (day !== -1) {
-        this.setState({checked: true});
-      }
-    })
+    // store.get('days').then((data) => {
+    //   if (data === null || data === undefined) {
+    //     data = [];
+    //     store.save('days', data);
+    //   }
+    //
+    //   if (this.isMounted()) {
+    //     this.setState({days: data});
+    //
+    //     //
+    //     // Populate the days with test data.
+    //     //
+    //     // var thirty = [];
+    //     // for (var i = 0; i < 365; i++) {
+    //     //   var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
+    //     //   thirty.push(newDay);
+    //     // }
+    //     // this.setState({days: thirty});
+    //   }
+    //
+    //   day = data.findIndex(function(day, index, days) {
+    //     if (day.dayId == dayKey) {
+    //       return true;
+    //     }
+    //   });
+    //
+    //   if (day !== -1) {
+    //     this.setState({checked: true});
+    //   }
+    // })
   },
 
   getInitialState: function() {
 
     return {
-      habit: '',
+      habits: [],
+      habit: {name: '', days: []},
+      text: '',
       checked: false,
-      days: [],
       editHabit: true,
     }
   },
 
   saveHabit: function() {
-    if (this.state.text) {
-      store.save('habit', this.state.text).then(() => {
-        this.setState({habit: this.state.text, editHabit: false});
+    // Check this.state.habits for a habit.name matching this.state.text.
+    var habitIdx = this.state.habits.findIndex( (habit, index, habits) => {
+      if (habit.name == this.state.text) {
+        return true;
+      }
+    });
+
+    if (habitIdx !== -1) {
+      // Move old habit to last (current Habit).
+      var habits = this.state.habits;
+      var storedHabit = habits.splice(habitIdx, 1);
+      habits.push(storedHabit[0]);
+
+      // Determine if the habit has been checked.
+      var day = storedHabit.days.findIndex(function(day, index, days) {
+        if (day.dayId == dayKey) {
+          return true;
+        }
+      });
+
+      var checked;
+      if (day !== -1) {
+        checked = true;
+      } else {
+        checked = false;
+      }
+      this.setState({habits: habits, habit: storedHabit[0], editHabit: false, checked: checked}, function() {
+        console.log('habits:', this.state.habits);
+        store.save('habits', this.state.habits);
       });
     } else {
-      this.setState({editHabit: false});
+      // Create new Habit.
+      var habit = {name: this.state.text, days: []};
+      var habits = this.state.habits;
+      habits.push(habit);
+
+      this.setState({
+        habits: habits,
+        habit: habit,
+        editHabit: false,
+        checked: false
+      }, function() {
+        console.log('this.state.habits:', this.state.habits);
+        store.save('habits', this.state.habits);
+      })
     }
   },
 
@@ -91,26 +152,29 @@ module.exports = React.createClass({
 
   addDay: function() {
     if (this.state.habit) {
-      if (this.state.days !== null) {
-        day = this.state.days.findIndex(function(day, index, days) {
-          if (day.dayId == dayKey) {
-            return true;
-          }
-        });
-      } else {
-        day = -1;
-      }
+      day = this.state.habit.days.findIndex(function(day, index, days) {
+        if (day.dayId == dayKey) {
+          return true;
+        }
+      });
 
       if (day === -1) {
-        var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit};
+        // Create a new day.
+        var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit.name};
 
-        if (this.state.days === null) {
-          this.setState({days: [newDay], checked: true});
-        } else {
-          this.state.days.push(newDay);
-          this.setState({days: this.state.days, checked: true});
-        }
-        store.save('days', this.state.days);
+        // Update the Habit
+        var habit = this.state.habits.pop();
+        habit.days.push(newDay);
+
+        // Update this.state.habits with the new Habit.
+        var habits = this.state.habits;
+        habits.push(habit);
+
+        // Update state.
+        this.setState({habits: habits, habit: habit, checked: true});
+
+        // Store the new habits.
+        store.save('habits', this.state.habits);
       }
     } else {
       this.setState({editHabit: true});
@@ -118,8 +182,14 @@ module.exports = React.createClass({
   },
 
   restartHabit: function() {
-    store.delete('days');
-    this.setState({days: [], editHabit: false, checked: false});
+    var habit = this.state.habits.pop();
+    habit.days = [];
+
+    var habits = this.state.habits
+    haibts.push(habit);
+
+    this.setState({habits: habits, habit: habit, editHabit: false, checked: false});
+    store.save('habits', this.state.habits);
   },
 
   cancelHabitEdit: function() {
@@ -129,8 +199,8 @@ module.exports = React.createClass({
   onShare: function() {
     Share.open({
       share_text: 'Habit Progress',
-      share_URL: 'For my ' + this.state.habit + ' habit I have done ' + this.state.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
-      title: 'For my ' + this.state.habit + ' habit I have done ' + this.state.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
+      share_URL: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
+      title: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
     },function(e) {
       console.log(e);
     });
@@ -147,16 +217,16 @@ module.exports = React.createClass({
       restart = <View></View>;
     } else {
       label = <Text style={styles.label}>Enter Habit</Text>;
-      input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text})} value={this.state.text} />;
+      input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text: text})} value={this.state.text} />;
       save =  <Button text={'Save'} onPress={this.saveHabit} textType={styles.saveText} buttonType={styles.saveButton} />;
       cancel =  <Button text={'Cancel'} onPress={this.cancelHabitEdit} />;
       restart = <Button text={'Restart Chain'} onPress={this.restartHabit} textType={styles.restartText} buttonType={styles.restartButton} />;
     }
 
     var chains;
-    if (this.state.habit) {
+    if (this.state.habit.name != '') {
       chains =  <View style={styles.chains}>
-                  {this.state.days.map(function(day, index) {
+                  {this.state.habit.days.map(function(day, index) {
                     return <Image key={day.dayId} style={styles.icon}
                             source={index % 30 == 0 && index != 0 ? require('./img/chain-icon-green.png') : require('./img/chain-icon.png')} />;
                   })}
@@ -171,7 +241,7 @@ module.exports = React.createClass({
           <View style={styles.shadow}>
             <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
               <View style={[styles.habit, this.state.checked && styles.checked]}>
-                <Text style={styles.habitText}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
+                <Text style={styles.habitText}>{this.state.habit.name != '' ? this.state.habit.name : 'No habit configured...'}</Text>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -186,7 +256,7 @@ module.exports = React.createClass({
             {restart}
           </View>
 
-          <Text style={styles.days}>{this.state.days ? this.state.days.length : '0'} link{this.state.days.length == 1 ? '' : 's'} in the chain.</Text>
+          <Text style={styles.days}>{this.state.habit.days ? this.state.habit.days.length : '0'} link{this.state.habit.days.length == 1 ? '' : 's'} in the chain.</Text>
         </View>
 
         <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
@@ -225,6 +295,7 @@ var styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.7,
     shadowRadius: 3,
+    elevation: 3
   },
 
   habitText: {
