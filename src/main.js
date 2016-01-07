@@ -27,10 +27,8 @@ module.exports = React.createClass({
   componentDidMount() {
     // Get the habits from AsyncStorage and set the current habit to the last one.
     store.get('habits').then((data) => {
-      console.log('habits data:', data);
-
       var habit;
-      var checked = false;
+      var checked;
 
       if (data === null || data === undefined || data.length == 0) {
         data = [];
@@ -38,58 +36,16 @@ module.exports = React.createClass({
         store.save('habits', []);
       } else {
         habit = data[data.length - 1];
-
-        day = habit.days.findIndex(function(day, index, days) {
-          if (day.dayId == dayKey) {
-            return true;
-          }
-        });
-
-        if (day !== -1) {
-          checked = true;
-        }
+        checked = this.checked(habit);
       }
 
       if (this.isMounted()) {
         this.setState({habit: habit, habits: data, editHabit: false, text: habit.name, checked: checked});
       }
     });
-
-    // Get the days array from AsyncStorage, and check if today has been checked.
-    // store.get('days').then((data) => {
-    //   if (data === null || data === undefined) {
-    //     data = [];
-    //     store.save('days', data);
-    //   }
-    //
-    //   if (this.isMounted()) {
-    //     this.setState({days: data});
-    //
-    //     //
-    //     // Populate the days with test data.
-    //     //
-    //     // var thirty = [];
-    //     // for (var i = 0; i < 365; i++) {
-    //     //   var newDay = {dayId: '0' + i, created_at: Date.now(), habit: this.state.habit};
-    //     //   thirty.push(newDay);
-    //     // }
-    //     // this.setState({days: thirty});
-    //   }
-    //
-    //   day = data.findIndex(function(day, index, days) {
-    //     if (day.dayId == dayKey) {
-    //       return true;
-    //     }
-    //   });
-    //
-    //   if (day !== -1) {
-    //     this.setState({checked: true});
-    //   }
-    // })
   },
 
   getInitialState: function() {
-
     return {
       habits: [],
       habit: {name: '', days: []},
@@ -113,22 +69,9 @@ module.exports = React.createClass({
       var storedHabit = habits.splice(habitIdx, 1);
       habits.push(storedHabit[0]);
 
-      // Determine if the habit has been checked.
-      console.log('storedHabit:', storedHabit);
-      var day = storedHabit[0].days.findIndex(function(day, index, days) {
-        if (day.dayId == dayKey) {
-          return true;
-        }
-      });
+      var checked = this.checked(storedHabit[0]);
 
-      var checked;
-      if (day !== -1) {
-        checked = true;
-      } else {
-        checked = false;
-      }
       this.setState({habits: habits, habit: storedHabit[0], editHabit: false, checked: checked}, function() {
-        console.log('habits:', this.state.habits);
         store.save('habits', this.state.habits);
       });
     } else {
@@ -137,13 +80,7 @@ module.exports = React.createClass({
       var habits = this.state.habits;
       habits.push(habit);
 
-      this.setState({
-        habits: habits,
-        habit: habit,
-        editHabit: false,
-        checked: false
-      }, function() {
-        console.log('this.state.habits:', this.state.habits);
+      this.setState({habits: habits, habit: habit, editHabit: false, checked: false }, function() {
         store.save('habits', this.state.habits);
       })
     }
@@ -151,37 +88,6 @@ module.exports = React.createClass({
 
   editHabit: function() {
     this.setState({editHabit: true})
-  },
-
-  addDay: function() {
-    if (this.state.habit) {
-      day = this.state.habit.days.findIndex(function(day, index, days) {
-        if (day.dayId == dayKey) {
-          return true;
-        }
-      });
-
-      if (day === -1) {
-        // Create a new day.
-        var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit.name};
-
-        // Update the Habit
-        var habit = this.state.habits.pop();
-        habit.days.push(newDay);
-
-        // Update this.state.habits with the new Habit.
-        var habits = this.state.habits;
-        habits.push(habit);
-
-        // Update state.
-        this.setState({habits: habits, habit: habit, checked: true});
-
-        // Store the new habits.
-        store.save('habits', this.state.habits);
-      }
-    } else {
-      this.setState({editHabit: true});
-    }
   },
 
   restartHabit: function() {
@@ -199,6 +105,41 @@ module.exports = React.createClass({
     this.setState({editHabit: false});
   },
 
+  addDay: function() {
+    if (this.state.habit) {
+      day = this.state.habit.days.findIndex(function(day, index, days) {
+        if (day.dayId == dayKey) {
+          return true;
+        }
+      });
+
+      if (day === -1) {
+        // Create a new day.
+        var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit.name};
+
+        // Update the Habit
+        var habit = this.state.habits.pop();
+        if (habit) {
+          habit.days.push(newDay);
+
+          // Update this.state.habits with the new Habit.
+          var habits = this.state.habits;
+          habits.push(habit);
+
+          // Update state.
+          this.setState({habits: habits, habit: habit, checked: true});
+
+          // Store the new habits.
+          store.save('habits', this.state.habits);
+        } else {
+          this.setState({editHabit: true});
+        }
+      }
+    } else {
+      this.setState({editHabit: true});
+    }
+  },
+
   onShare: function() {
     Share.open({
       share_text: 'Habit Progress',
@@ -207,6 +148,20 @@ module.exports = React.createClass({
     },function(e) {
       console.log(e);
     });
+  },
+
+  checked: function(habit) {
+    day = habit.days.findIndex(function(day, index, days) {
+      if (day.dayId == dayKey) {
+        return true;
+      }
+    });
+
+    if (day !== -1) {
+      return true;
+    }  else {
+      return false;
+    }
   },
 
   render: function() {
