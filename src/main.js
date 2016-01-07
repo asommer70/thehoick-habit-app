@@ -12,6 +12,8 @@ var {
 } = React;
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
+var Dimensions = require('Dimensions');
+var windowSize = Dimensions.get('window');
 
 var Button = require('./components/button');
 
@@ -238,6 +240,7 @@ module.exports = React.createClass({
 
     return (
       <View style={styles.container}>
+      <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           <View style={styles.shadow}>
             <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
@@ -262,6 +265,7 @@ module.exports = React.createClass({
 
         <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
          {chains}
+        </ScrollView>
         </ScrollView>
 
         <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
@@ -339,6 +343,10 @@ var styles = StyleSheet.create({
 
   icon: {
     padding: 0,
+  },
+
+  mainScroll: {
+    height: 500
   },
 
   scroll: {
