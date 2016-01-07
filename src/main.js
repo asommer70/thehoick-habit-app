@@ -112,7 +112,8 @@ module.exports = React.createClass({
       habits.push(storedHabit[0]);
 
       // Determine if the habit has been checked.
-      var day = storedHabit.days.findIndex(function(day, index, days) {
+      console.log('storedHabit:', storedHabit);
+      var day = storedHabit[0].days.findIndex(function(day, index, days) {
         if (day.dayId == dayKey) {
           return true;
         }
@@ -186,7 +187,7 @@ module.exports = React.createClass({
     habit.days = [];
 
     var habits = this.state.habits
-    haibts.push(habit);
+    habits.push(habit);
 
     this.setState({habits: habits, habit: habit, editHabit: false, checked: false});
     store.save('habits', this.state.habits);
