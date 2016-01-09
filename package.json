@@ -6,6 +6,7 @@
     "start": "node_modules/react-native/packager/packager.sh"
   },
   "dependencies": {
+    "moment": "^2.11.0",
     "react-native": "^0.17.0",
     "react-native-share": "lifuzu/react-native-share",
     "react-native-simple-store": "^0.1.0"

@@ -12,14 +12,23 @@ var {
 } = React;
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
-var Dimensions = require('Dimensions');
-var windowSize = Dimensions.get('window');
+var moment = require('moment');
 
 var Button = require('./components/button');
 
-var today = new Date();
-var dayKey = today.getMonth().toString() + today.getDate().toString() + today.getFullYear().toString();
-var yesterdayKey = today.getMonth().toString() + (today.getDate() - 1).toString() + today.getFullYear().toString();
+// var today = moment();
+// var today = moment().add(1, 'days');
+// var today = moment().add(2, 'days');
+// var today = moment().add(7, 'days');
+//var today = moment().add(8, 'days');
+// var today = moment().add(9, 'days');
+// var today = moment().add(10, 'days');
+// var today = moment().add(11, 'days');
+// var today = moment().add(29, 'days');
+var today = moment().add(30, 'days');
+
+//var dayKey = today.format('MMDDYYYY');
+var dayKey = today.unix();
 var day;
 
 
@@ -30,6 +39,8 @@ module.exports = React.createClass({
       var habit;
       var checked;
 
+      console.log('componentDidMount data:', data);
+
       if (data === null || data === undefined || data.length == 0) {
         data = [];
         habit = {name: '', days: []};
@@ -37,10 +48,19 @@ module.exports = React.createClass({
       } else {
         habit = data[data.length - 1];
         checked = this.checked(habit);
+
+        // Needs reversing... I think cause of the way it gets saved to storage.
+        //habit.days.reverse();
+        //habit.days.sort(function(a, b) { return b.created_at - a.created_at });
       }
 
       if (this.isMounted()) {
-        this.setState({habit: habit, habits: data, editHabit: false, text: habit.name, checked: checked});
+        this.setState({habit: habit, habits: data, editHabit: false, text: habit.name, checked: checked}, function() {
+          console.log('this.state.habits:', this.state.habits);
+          console.log('days:', this.state.habit.days);
+
+          //store.save('testHabits', this.state.habits);
+        });
       }
     });
   },
@@ -107,24 +127,54 @@ module.exports = React.createClass({
 
   addDay: function() {
     if (this.state.habit) {
+      // Find out if there is an entry in days for today.
       day = this.state.habit.days.findIndex(function(day, index, days) {
         if (day.dayId == dayKey) {
           return true;
         }
       });
 
+      console.log('addDay day:', day);
+
+      // If no entry create one.
       if (day === -1) {
         // Create a new day.
-        var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit.name};
-
-        // Update the Habit
+        var newDay = {dayId: dayKey, created_at: today.unix(), habit: this.state.habit.name, checked: true};
+        // Get the Habit
         var habit = this.state.habits.pop();
         if (habit) {
+          //
+          // Maybe extract this figure out the missing days code into it's own function...
+          //
+          // Find the number of days between today and the last day recorded.
+          var lastDay = habit.days[habit.days.length - 1];
+
+          if (lastDay !== undefined) {
+            console.log('lastDay:', lastDay);
+            var momentLastDay = moment.unix(lastDay.created_at);
+            console.log('momentLastDay:', momentLastDay);
+            console.log('momentLastDay.format:', momentLastDay.format('MMDDYYYY'));
+            var diffOfDays = today.diff(momentLastDay, 'days');
+            console.log('diffOfDays:', diffOfDays);
+
+            if (diffOfDays > 1) {
+              // Do diffOfDays - 1 to exclude the lastDay entry from being added inside the loop.
+              for (var i = diffOfDays - 1; i > 0; i--) {
+                var momentBetweenDay = today.subtract(i, 'days');
+
+                var betweenDay = {dayId: momentBetweenDay.unix(), created_at: momentBetweenDay.unix(), habit: this.state.habit.name, checked: false }
+                habit.days.push(betweenDay);
+              }
+            }
+          }
+
           habit.days.push(newDay);
 
           // Update this.state.habits with the new Habit.
           var habits = this.state.habits;
           habits.push(habit);
+
+          console.log('habits:', habits);
 
           // Update state.
           this.setState({habits: habits, habit: habit, checked: true});
@@ -164,6 +214,17 @@ module.exports = React.createClass({
     }
   },
 
+  setTestEnv: function() {
+    console.log('Setting test environment...');
+    store.get('testHabits').then((data) => {
+      console.log('testHabits data:', data);
+      this.setState({habits: data, habit: data[data.length - 1]}, function() {
+        console.log('setTestEnv this.state.habits:', this.state.habits);
+        store.save('habits', this.state.habits);
+      });
+    })
+  },
+
   render: function() {
     var input, save;
 
@@ -182,15 +243,55 @@ module.exports = React.createClass({
     }
 
     var chains;
+    var habitDays = this.state.habit.days;
+    //habitDays.reverse();
+    console.log('habitDays:', habitDays);
+
+    var chainIcons = habitDays.map(function(day, index) {
+      var icon;
+      if (index % 30 == 0 && index !=0) {
+        icon = require('./img/chain-icon-green.png');
+      } else {
+        icon = require('./img/chain-icon.png');
+      }
+
+      if (day.checked == false) {
+        icon = require('./img/broken-chain-left-icon.png');
+      }
+
+      return <Image key={day.dayId} style={styles.icon}
+              source={icon} />;
+    });
+
     if (this.state.habit.name != '') {
       chains =  <View style={styles.chains}>
-                  {this.state.habit.days.map(function(day, index) {
-                    return <Image key={day.dayId} style={styles.icon}
-                            source={index % 30 == 0 && index != 0 ? require('./img/chain-icon-green.png') : require('./img/chain-icon.png')} />;
-                  })}
+                  {chainIcons}
                 </View>
     } else {
       chains = <View></View>;
+    }
+
+    //chainIcons.reverse();
+
+    var checkedDays;
+    var checks;
+    if (this.state.habit.days.length > 0) {
+      //checks = this.state.habit.days.filter(function(day) {  return day.checked });
+      //checkedDays = checks.length;
+
+      // Need an array of checked days starting with today going back to the first unchecked day.
+      checks = [];
+      for (var i = habitDays.length - 1; i > 0; i--) {
+        if (habitDays[i].checked) {
+          checks.push(habitDays[i]);
+        } else {
+          break;
+        }
+      }
+      checkedDays = checks.length;
+    } else {
+      checkdDays = '0';
+      checks = [];
     }
 
     return (
@@ -215,13 +316,16 @@ module.exports = React.createClass({
             {restart}
           </View>
 
-          <Text style={styles.days}>{this.state.habit.days ? this.state.habit.days.length : '0'} link{this.state.habit.days.length == 1 ? '' : 's'} in the chain.</Text>
+          <Text style={styles.days}>
+            {checkedDays} link{checks.length == 1 ? '' : 's'} in the chain.
+          </Text>
         </View>
 
         <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
          {chains}
         </ScrollView>
         </ScrollView>
+        <Button text={'Test Environment'} onPress={this.setTestEnv} textType={styles.shareText} buttonType={styles.shareButton} />
 
         <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
       </View>

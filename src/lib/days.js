@@ -5,32 +5,11 @@ module.exports = {
   yesterdayKey: today.getMonth().toString() + (today.getDate() - 1).toString() + today.getFullYear().toString(),
   day: undefined,
 
-  findToday: function() {
-    // Find today's days entry.
-    if (this.state.days !== null) {
-      day = this.state.days.findIndex(function(day, index, days) {
-        if (day.dayId == dayKey) {
-          return true;
-        }
-      });
-    } else {
-      day = -1;
-    }
-  },
-
-  addDay: function() {
-    if (day === -1) {
-      var newDay = {dayId: dayKey, created_at: Date.now(), habit: this.state.habit};
-
-      if (this.state.days === null) {
-        this.setState({days: [newDay], checked: true});
-      } else {
-        this.state.days.push(newDay);
-        this.setState({days: this.state.days, checked: true});
-      }
-      store.save('days', this.state.days);
-    }
-  },
+  // Determine if the Habit is checked.
+  //  if not find the number of days between today and the last day recorded.
+  //  if the number of days is greater than 1 add entries for those days with the different unchecked status.
+  //  else add a day for today with a checked status.
+  // Might be able to just put this on addDays().
 
   checkPastDays: function(days) {
     // Get last day entered.
