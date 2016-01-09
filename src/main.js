@@ -18,17 +18,16 @@ var Button = require('./components/button');
 
 // var today = moment();
 // var today = moment().add(1, 'days');
-// var today = moment().add(2, 'days');
+var today = moment().add(2, 'days');
 // var today = moment().add(7, 'days');
 //var today = moment().add(8, 'days');
 // var today = moment().add(9, 'days');
 // var today = moment().add(10, 'days');
 // var today = moment().add(11, 'days');
 // var today = moment().add(29, 'days');
-var today = moment().add(30, 'days');
+//var today = moment().add(30, 'days');
 
-//var dayKey = today.format('MMDDYYYY');
-var dayKey = today.unix();
+var dayKey = today.format('MMDDYYYY');
 var day;
 
 
@@ -48,6 +47,7 @@ module.exports = React.createClass({
       } else {
         habit = data[data.length - 1];
         checked = this.checked(habit);
+        console.log('checked:', checked);
 
         // Needs reversing... I think cause of the way it gets saved to storage.
         //habit.days.reverse();
@@ -134,18 +134,12 @@ module.exports = React.createClass({
         }
       });
 
-      console.log('addDay day:', day);
-
       // If no entry create one.
       if (day === -1) {
-        // Create a new day.
         var newDay = {dayId: dayKey, created_at: today.unix(), habit: this.state.habit.name, checked: true};
-        // Get the Habit
         var habit = this.state.habits.pop();
+
         if (habit) {
-          //
-          // Maybe extract this figure out the missing days code into it's own function...
-          //
           // Find the number of days between today and the last day recorded.
           var lastDay = habit.days[habit.days.length - 1];
 
@@ -162,7 +156,7 @@ module.exports = React.createClass({
               for (var i = diffOfDays - 1; i > 0; i--) {
                 var momentBetweenDay = today.subtract(i, 'days');
 
-                var betweenDay = {dayId: momentBetweenDay.unix(), created_at: momentBetweenDay.unix(), habit: this.state.habit.name, checked: false }
+                var betweenDay = {dayId: momentBetweenDay.format('MMDDYYYY'), created_at: momentBetweenDay.unix(), habit: this.state.habit.name, checked: false }
                 habit.days.push(betweenDay);
               }
             }
@@ -271,18 +265,14 @@ module.exports = React.createClass({
       chains = <View></View>;
     }
 
-    //chainIcons.reverse();
-
     var checkedDays;
     var checks;
-    if (this.state.habit.days.length > 0) {
-      //checks = this.state.habit.days.filter(function(day) {  return day.checked });
-      //checkedDays = checks.length;
+    if (habitDays.length >= 1) {
 
       // Need an array of checked days starting with today going back to the first unchecked day.
       checks = [];
-      for (var i = habitDays.length - 1; i > 0; i--) {
-        if (habitDays[i].checked) {
+      for (var i = habitDays.length; i > 0; i--) {
+        if (habitDays[i - 1].checked) {
           checks.push(habitDays[i]);
         } else {
           break;
@@ -290,7 +280,8 @@ module.exports = React.createClass({
       }
       checkedDays = checks.length;
     } else {
-      checkdDays = '0';
+      console.log('balls...');
+      checkedDays = '0';
       checks = [];
     }
 
