@@ -13,12 +13,17 @@ var {
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
 var moment = require('moment');
+var EventEmitter = require('EventEmitter');
+var Subscribable = require('Subscribable');
 
+var Habit = require('./components/habit');
 var Button = require('./components/button');
+var Form = require('./components/form');
+var LinkCount = require('./components/link-count');
 
-// var today = moment();
+var today = moment();
 // var today = moment().add(1, 'days');
-var today = moment().add(2, 'days');
+// var today = moment().add(2, 'days');
 // var today = moment().add(7, 'days');
 //var today = moment().add(8, 'days');
 // var today = moment().add(9, 'days');
@@ -32,37 +37,17 @@ var day;
 
 
 module.exports = React.createClass({
-  componentDidMount() {
-    // Get the habits from AsyncStorage and set the current habit to the last one.
-    store.get('habits').then((data) => {
-      var habit;
-      var checked;
+  mixins: [Subscribable.Mixin],
 
-      console.log('componentDidMount data:', data);
-
-      if (data === null || data === undefined || data.length == 0) {
-        data = [];
-        habit = {name: '', days: []};
-        store.save('habits', []);
-      } else {
-        habit = data[data.length - 1];
-        checked = this.checked(habit);
-        console.log('checked:', checked);
-
-        // Needs reversing... I think cause of the way it gets saved to storage.
-        //habit.days.reverse();
-        //habit.days.sort(function(a, b) { return b.created_at - a.created_at });
-      }
-
-      if (this.isMounted()) {
-        this.setState({habit: habit, habits: data, editHabit: false, text: habit.name, checked: checked}, function() {
-          console.log('this.state.habits:', this.state.habits);
-          console.log('days:', this.state.habit.days);
-
-          //store.save('testHabits', this.state.habits);
-        });
-      }
+  componentWillMount: function() {
+    this.eventEmitter = new EventEmitter();
+    this.addListenerOn(this.eventEmitter, 'got-habits', (habits) => {
+      console.log('got-habits event...');
+      this.setState({habits: habits});
     });
+  },
+
+  componentDidMount: function() {
   },
 
   getInitialState: function() {
@@ -75,114 +60,14 @@ module.exports = React.createClass({
     }
   },
 
-  saveHabit: function() {
-    // Check this.state.habits for a habit.name matching this.state.text.
-    var habitIdx = this.state.habits.findIndex( (habit, index, habits) => {
-      if (habit.name == this.state.text) {
-        return true;
-      }
-    });
 
-    if (habitIdx !== -1) {
-      // Move old habit to last (current Habit).
-      var habits = this.state.habits;
-      var storedHabit = habits.splice(habitIdx, 1);
-      habits.push(storedHabit[0]);
-
-      var checked = this.checked(storedHabit[0]);
-
-      this.setState({habits: habits, habit: storedHabit[0], editHabit: false, checked: checked}, function() {
-        store.save('habits', this.state.habits);
-      });
-    } else {
-      // Create new Habit.
-      var habit = {name: this.state.text, days: []};
-      var habits = this.state.habits;
-      habits.push(habit);
-
-      this.setState({habits: habits, habit: habit, editHabit: false, checked: false }, function() {
-        store.save('habits', this.state.habits);
-      })
-    }
-  },
-
-  editHabit: function() {
-    this.setState({editHabit: true})
-  },
-
-  restartHabit: function() {
-    var habit = this.state.habits.pop();
-    habit.days = [];
-
-    var habits = this.state.habits
-    habits.push(habit);
-
-    this.setState({habits: habits, habit: habit, editHabit: false, checked: false});
-    store.save('habits', this.state.habits);
-  },
-
-  cancelHabitEdit: function() {
-    this.setState({editHabit: false});
-  },
-
-  addDay: function() {
-    if (this.state.habit) {
-      // Find out if there is an entry in days for today.
-      day = this.state.habit.days.findIndex(function(day, index, days) {
-        if (day.dayId == dayKey) {
-          return true;
-        }
-      });
-
-      // If no entry create one.
-      if (day === -1) {
-        var newDay = {dayId: dayKey, created_at: today.unix(), habit: this.state.habit.name, checked: true};
-        var habit = this.state.habits.pop();
-
-        if (habit) {
-          // Find the number of days between today and the last day recorded.
-          var lastDay = habit.days[habit.days.length - 1];
-
-          if (lastDay !== undefined) {
-            console.log('lastDay:', lastDay);
-            var momentLastDay = moment.unix(lastDay.created_at);
-            console.log('momentLastDay:', momentLastDay);
-            console.log('momentLastDay.format:', momentLastDay.format('MMDDYYYY'));
-            var diffOfDays = today.diff(momentLastDay, 'days');
-            console.log('diffOfDays:', diffOfDays);
-
-            if (diffOfDays > 1) {
-              // Do diffOfDays - 1 to exclude the lastDay entry from being added inside the loop.
-              for (var i = diffOfDays - 1; i > 0; i--) {
-                var momentBetweenDay = today.subtract(i, 'days');
-
-                var betweenDay = {dayId: momentBetweenDay.format('MMDDYYYY'), created_at: momentBetweenDay.unix(), habit: this.state.habit.name, checked: false }
-                habit.days.push(betweenDay);
-              }
-            }
-          }
-
-          habit.days.push(newDay);
-
-          // Update this.state.habits with the new Habit.
-          var habits = this.state.habits;
-          habits.push(habit);
-
-          console.log('habits:', habits);
-
-          // Update state.
-          this.setState({habits: habits, habit: habit, checked: true});
-
-          // Store the new habits.
-          store.save('habits', this.state.habits);
-        } else {
-          this.setState({editHabit: true});
-        }
-      }
-    } else {
-      this.setState({editHabit: true});
-    }
-  },
+  // editHabit: function() {
+  //   this.setState({editHabit: true})
+  // },
+  //
+  // cancelHabitEdit: function() {
+  //   this.setState({editHabit: false});
+  // },
 
   onShare: function() {
     Share.open({
@@ -209,37 +94,17 @@ module.exports = React.createClass({
   },
 
   setTestEnv: function() {
-    console.log('Setting test environment...');
     store.get('testHabits').then((data) => {
-      console.log('testHabits data:', data);
       this.setState({habits: data, habit: data[data.length - 1]}, function() {
-        console.log('setTestEnv this.state.habits:', this.state.habits);
         store.save('habits', this.state.habits);
       });
     })
   },
 
   render: function() {
-    var input, save;
-
-    if (this.state.editHabit !== true) {
-      label = <View></View>;
-      input = <View></View>;
-      save = <View></View>;
-      cancel = <View></View>;
-      restart = <View></View>;
-    } else {
-      label = <Text style={styles.label}>Enter Habit</Text>;
-      input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text: text})} value={this.state.text} />;
-      save =  <Button text={'Save'} onPress={this.saveHabit} textType={styles.saveText} buttonType={styles.saveButton} />;
-      cancel =  <Button text={'Cancel'} onPress={this.cancelHabitEdit} />;
-      restart = <Button text={'Restart Chain'} onPress={this.restartHabit} textType={styles.restartText} buttonType={styles.restartButton} />;
-    }
 
     var chains;
     var habitDays = this.state.habit.days;
-    //habitDays.reverse();
-    console.log('habitDays:', habitDays);
 
     var chainIcons = habitDays.map(function(day, index) {
       var icon;
@@ -265,51 +130,15 @@ module.exports = React.createClass({
       chains = <View></View>;
     }
 
-    var checkedDays;
-    var checks;
-    if (habitDays.length >= 1) {
-
-      // Need an array of checked days starting with today going back to the first unchecked day.
-      checks = [];
-      for (var i = habitDays.length; i > 0; i--) {
-        if (habitDays[i - 1].checked) {
-          checks.push(habitDays[i]);
-        } else {
-          break;
-        }
-      }
-      checkedDays = checks.length;
-    } else {
-      console.log('balls...');
-      checkedDays = '0';
-      checks = [];
-    }
-
     return (
       <View style={styles.container}>
       <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
-          <View style={styles.shadow}>
-            <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
-              <View style={[styles.habit, this.state.checked && styles.checked]}>
-                <Text style={styles.habitText}>{this.state.habit.name != '' ? this.state.habit.name : 'No habit configured...'}</Text>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
+          <Habit habits={this.state.habits} events={this.eventEmitter}/>
 
-          <View style={styles.formElement}>
-            {label}
-            {input}
-            <View style={styles.editButtons}>
-              {save}
-              {cancel}
-            </View>
-            {restart}
-          </View>
+          <Form habits={this.state.habits} events={this.eventEmitter}/>
 
-          <Text style={styles.days}>
-            {checkedDays} link{checks.length == 1 ? '' : 's'} in the chain.
-          </Text>
+          <LinkCount days={this.state.days} events={this.eventEmitter}/>
         </View>
 
         <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
@@ -337,60 +166,6 @@ var styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  habit: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    borderWidth: 2,
-    borderColor: '#DFD9B9',
-  },
-
-  shadow: {
-    shadowColor: '#424242',
-    shadowOffset: {width: 0, height: 3},
-    shadowOpacity: 0.7,
-    shadowRadius: 3,
-    elevation: 3
-  },
-
-  habitText: {
-    fontSize: 35,
-    color: '#DFD9B9'
-  },
-
-  checked: {
-    backgroundColor: '#4D9E7E',
-  },
-
-  input: {
-    padding: 4,
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#424242',
-    borderRadius: 3,
-    margin: 5,
-    width: 200,
-    alignSelf: 'center',
-  },
-
-  formElement: {
-    backgroundColor: '#eeeeee',
-    margin: 5,
-  },
-
-  label: {
-    alignSelf: 'center',
-    justifyContent: 'center',
-    fontSize: 18,
-    marginTop: 10,
-  },
-
-  days: {
-    padding: 10,
-    color: '#DFD9B9',
-    fontSize: 16
-  },
-
   icon: {
     padding: 0,
   },
@@ -410,29 +185,6 @@ var styles = StyleSheet.create({
     overflow: 'visible',
     borderColor: '#DFD9B9',
     borderWidth: 1
-  },
-
-  restartButton: {
-    borderColor: '#CE4B41',
-  },
-
-  restartText: {
-    color: '#CE4B41',
-  },
-
-  saveButton: {
-    borderColor: '#4D9E7E',
-  },
-
-  saveText: {
-    color: '#4D9E7E',
-  },
-
-  editButtons: {
-    flexDirection: 'row',
-    flex: 2,
-    alignSelf: 'center',
-    justifyContent: 'center',
   },
 
   share: {
