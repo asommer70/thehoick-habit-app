@@ -14,7 +14,6 @@ module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   getInitialState: function() {
-    console.log('form this.props.habits:', this.props.habits);
     return {
       text: '',
       editHabit: false,
@@ -24,19 +23,16 @@ module.exports = React.createClass({
 
   componentWillMount: function() {
     this.addListenerOn(this.props.events, 'edit-habit', () => {
-      console.log('edit-habit event...');
       this.setState({editHabit: true})
     });
 
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-      console.log('form got-habits event...');
       this.setState({habits: habits});
     });
   },
 
   saveHabit: function() {
     // Check this.state.habits for a habit.name matching this.state.text.
-    console.log('saveHabit habits:', this.state.habits);
     var habitIdx = this.state.habits.findIndex( (habit, index, habits) => {
       if (habit.name == this.state.text) {
         return true;

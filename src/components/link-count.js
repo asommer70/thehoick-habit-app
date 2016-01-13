@@ -11,19 +11,19 @@ module.exports = React.createClass({
 
   componentDidMount: function() {
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-      console.log('link-count got-habits event...');
-
       this.setState({days: habits[habits.length - 1].days});
     });
 
     this.addListenerOn(this.props.events, 'day-added', (habits) => {
-      console.log('link-count day-added event...');
       this.setState({days: habits[habits.length - 1].days});
     });
 
     this.addListenerOn(this.props.events, 'chain-restarted', () => {
-      console.log('link-count chain-restarted event...');
       this.setState({days: []});
+    });
+
+    this.addListenerOn(this.props.events, 'new-habit', (habits) => {
+      this.setState({days: habits[habits.length - 1].days});
     });
   },
 

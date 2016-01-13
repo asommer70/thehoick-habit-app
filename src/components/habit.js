@@ -11,6 +11,8 @@ var moment = require('moment');
 
 var today = moment();
 // var today = moment().add(1, 'days');
+// var today = moment().add(7, 'days');
+// var today = moment().add(8, 'days');
 var dayKey = today.format('MMDDYYYY');
 
 module.exports = React.createClass({
@@ -18,7 +20,6 @@ module.exports = React.createClass({
 
   componentWillMount: function() {
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      console.log('new-habit event...');
       var habit = habits[habits.length - 1];
       var checked = this.checked(habit);
 
@@ -26,7 +27,6 @@ module.exports = React.createClass({
     });
 
     this.addListenerOn(this.props.events, 'chain-restarted', () => {
-      console.log('link-count chain-restarted event...');
       this.setState({checked: false});
     });
   },
@@ -40,20 +40,16 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function() {
-    console.log('habit.js componentDidMount habits:', this.state.habits);
     // Get the habits from AsyncStorage and set the current habit to the last one.
     store.get('habits').then((data) => {
       var habit;
       var checked;
-      console.log('store.get data:', data);
 
       habit = data[data.length - 1];
       checked = this.checked(habit);
 
       if (this.isMounted()) {
         this.setState({habit: habit, habits: data, checked: checked}, function() {
-          //console.log('isMounted this.state.habits:', this.state.habits);
-          //store.save('testHabits', this.state.habits);
           this.props.events.emit('got-habits', this.state.habits);
         });
       }
@@ -65,15 +61,12 @@ module.exports = React.createClass({
   },
 
   checked: function(habit) {
-    console.log('checked habit:', habit);
     var day = habit.days.findIndex(function(day, index, days) {
-      //console.log(day.dayId);
       if (day.dayId == dayKey) {
         return true;
       }
     });
 
-    console.log('checked day:', day);
     if (day !== -1) {
       return true;
     }  else {

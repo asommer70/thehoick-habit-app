@@ -20,20 +20,7 @@ var Habit = require('./components/habit');
 var Button = require('./components/button');
 var Form = require('./components/form');
 var LinkCount = require('./components/link-count');
-
-var today = moment();
-// var today = moment().add(1, 'days');
-// var today = moment().add(2, 'days');
-// var today = moment().add(7, 'days');
-//var today = moment().add(8, 'days');
-// var today = moment().add(9, 'days');
-// var today = moment().add(10, 'days');
-// var today = moment().add(11, 'days');
-// var today = moment().add(29, 'days');
-//var today = moment().add(30, 'days');
-
-var dayKey = today.format('MMDDYYYY');
-var day;
+var Chains = require('./components/chains');
 
 
 module.exports = React.createClass({
@@ -41,33 +28,18 @@ module.exports = React.createClass({
 
   componentWillMount: function() {
     this.eventEmitter = new EventEmitter();
-    this.addListenerOn(this.eventEmitter, 'got-habits', (habits) => {
-      console.log('got-habits event...');
-      this.setState({habits: habits});
-    });
-  },
 
-  componentDidMount: function() {
+    this.addListenerOn(this.eventEmitter, 'got-habits', (habits) => {
+      this.setState({habits: habits, habit: habits[habits.length - 1]});
+    });
   },
 
   getInitialState: function() {
     return {
       habits: [],
       habit: {name: '', days: []},
-      text: '',
-      checked: false,
-      editHabit: true,
     }
   },
-
-
-  // editHabit: function() {
-  //   this.setState({editHabit: true})
-  // },
-  //
-  // cancelHabitEdit: function() {
-  //   this.setState({editHabit: false});
-  // },
 
   onShare: function() {
     Share.open({
@@ -79,73 +51,21 @@ module.exports = React.createClass({
     });
   },
 
-  checked: function(habit) {
-    day = habit.days.findIndex(function(day, index, days) {
-      if (day.dayId == dayKey) {
-        return true;
-      }
-    });
-
-    if (day !== -1) {
-      return true;
-    }  else {
-      return false;
-    }
-  },
-
-  setTestEnv: function() {
-    store.get('testHabits').then((data) => {
-      this.setState({habits: data, habit: data[data.length - 1]}, function() {
-        store.save('habits', this.state.habits);
-      });
-    })
-  },
 
   render: function() {
-
-    var chains;
-    var habitDays = this.state.habit.days;
-
-    var chainIcons = habitDays.map(function(day, index) {
-      var icon;
-      if (index % 30 == 0 && index !=0) {
-        icon = require('./img/chain-icon-green.png');
-      } else {
-        icon = require('./img/chain-icon.png');
-      }
-
-      if (day.checked == false) {
-        icon = require('./img/broken-chain-left-icon.png');
-      }
-
-      return <Image key={day.dayId} style={styles.icon}
-              source={icon} />;
-    });
-
-    if (this.state.habit.name != '') {
-      chains =  <View style={styles.chains}>
-                  {chainIcons}
-                </View>
-    } else {
-      chains = <View></View>;
-    }
-
     return (
       <View style={styles.container}>
-      <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
-        <View style={styles.wrapper}>
-          <Habit habits={this.state.habits} events={this.eventEmitter}/>
+        <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
+          <View style={styles.wrapper}>
+            <Habit habits={this.state.habits} events={this.eventEmitter}/>
 
-          <Form habits={this.state.habits} events={this.eventEmitter}/>
+            <Form habits={this.state.habits} events={this.eventEmitter}/>
 
-          <LinkCount days={this.state.days} events={this.eventEmitter}/>
-        </View>
+            <LinkCount days={this.state.days} events={this.eventEmitter}/>
+          </View>
 
-        <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
-         {chains}
+          <Chains habits={this.state.habits} events={this.eventEmitter}/>
         </ScrollView>
-        </ScrollView>
-        <Button text={'Test Environment'} onPress={this.setTestEnv} textType={styles.shareText} buttonType={styles.shareButton} />
 
         <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
       </View>
@@ -166,25 +86,8 @@ var styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  icon: {
-    padding: 0,
-  },
-
   mainScroll: {
     height: 500
-  },
-
-  scroll: {
-    height: 600,
-  },
-
-  chains: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 5,
-    overflow: 'visible',
-    borderColor: '#DFD9B9',
-    borderWidth: 1
   },
 
   share: {
