@@ -26,13 +26,14 @@ module.exports = React.createClass({
       this.setState({editHabit: true})
     });
 
-    this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-      this.setState({habits: habits});
-    });
+    // this.addListenerOn(this.props.events, 'got-habits', (habits) => {
+    //   this.setState({habits: habits});
+    // });
   },
 
   saveHabit: function() {
     // Check this.state.habits for a habit.name matching this.state.text.
+    console.log('form this.state.habits:', this.state.habits);
     var habitIdx = this.state.habits.findIndex( (habit, index, habits) => {
       if (habit.name == this.state.text) {
         return true;
@@ -55,7 +56,7 @@ module.exports = React.createClass({
       var habits = this.state.habits;
       habits.push(habit);
 
-      this.setState({habits: habits, habit: habit, editHabit: false}, function() {
+      this.setState({habits: habits, habit: habit, editHabit: false}, () => {
         this.props.events.emit('new-habit', this.state.habits);
         store.save('habits', this.state.habits);
       })
@@ -67,19 +68,19 @@ module.exports = React.createClass({
     this.props.events.emit('cancel-habit');
   },
 
-  restartHabit: function() {
-    var habit = this.state.habits.pop();
-    habit.days = [];
-
-    var habits = this.state.habits
-    habits.push(habit);
-
-    this.setState({habits: habits, habit: habit, editHabit: false, checked: false}, function() {
-      store.save('habits', this.state.habits);
-      this.props.events.emit('got-habits', this.state.habits);
-      this.props.events.emit('chain-restarted');
-    });
-  },
+  // restartHabit: function() {
+  //   var habit = this.state.habits.pop();
+  //   habit.days = [];
+  //
+  //   var habits = this.state.habits
+  //   habits.push(habit);
+  //
+  //   this.setState({habits: habits, habit: habit, editHabit: false, checked: false}, () => {
+  //     store.save('habits', this.state.habits);
+  //     this.props.events.emit('got-habits', this.state.habits);
+  //     this.props.events.emit('chain-restarted');
+  //   });
+  // },
 
   render: function() {
     var input, save;

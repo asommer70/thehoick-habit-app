@@ -56,11 +56,11 @@ module.exports = React.createClass({
     });
   },
 
-  editHabit: function() {
-    this.props.events.emit('edit-habit');
-  },
-
   checked: function(habit) {
+    if (habit === undefined) {
+      return false;
+    }
+
     var day = habit.days.findIndex(function(day, index, days) {
       if (day.dayId == dayKey) {
         return true;
@@ -134,7 +134,7 @@ module.exports = React.createClass({
       <View style={styles.shadow}>
         <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
           <View style={[styles.habit, this.state.checked && styles.checked]}>
-            <Text style={styles.habitText}>{this.state.habit.name != '' ? this.state.habit.name : 'No habit configured...'}</Text>
+            <Text style={styles.habitText}>{this.state.habit && this.state.habit.name != '' ? this.state.habit.name : 'No habit configured...'}</Text>
           </View>
         </TouchableWithoutFeedback>
       </View>

@@ -1,35 +1,27 @@
 var React = require('react-native');
 var {
   View,
-  Text,
   StyleSheet,
-  TextInput,
-  AsyncStorage,
-  TouchableWithoutFeedback,
-  Image,
   ScrollView,
-  TouchableHighlight
 } = React;
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
 var moment = require('moment');
-var EventEmitter = require('EventEmitter');
+// var EventEmitter = require('EventEmitter');
 var Subscribable = require('Subscribable');
 
 var Habit = require('./components/habit');
 var Button = require('./components/button');
-var Form = require('./components/form');
 var LinkCount = require('./components/link-count');
 var Chains = require('./components/chains');
-
 
 module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   componentWillMount: function() {
-    this.eventEmitter = new EventEmitter();
+    // this.eventEmitter = new EventEmitter();
 
-    this.addListenerOn(this.eventEmitter, 'got-habits', (habits) => {
+    this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
   },
@@ -51,23 +43,32 @@ module.exports = React.createClass({
     });
   },
 
+  openSettings: function() {
+    this.props.navigator.push({name: 'settings'});
+  },
+
+  openHabits: function() {
+    this.props.navigator.push({name: 'habits'});
+  },
 
   render: function() {
     return (
       <View style={styles.container}>
         <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
           <View style={styles.wrapper}>
-            <Habit habits={this.state.habits} events={this.eventEmitter}/>
+            <Habit habits={this.state.habits} events={this.props.events}/>
 
-            <Form habits={this.state.habits} events={this.eventEmitter}/>
-
-            <LinkCount days={this.state.days} events={this.eventEmitter}/>
+            <LinkCount days={this.state.habit.days} events={this.props.events}/>
           </View>
 
-          <Chains habits={this.state.habits} events={this.eventEmitter}/>
+          <Chains habits={this.state.habits} events={this.props.events}/>
         </ScrollView>
 
-        <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
+        <View style={styles.buttonRow}>
+          <Button text={'Settings'} onPress={this.openSettings} textType={styles.navText} buttonType={styles.shareButton} />
+          <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
+          <Button text={'Habits'} onPress={this.openHabits} textType={styles.navText} buttonType={styles.shareButton} />
+        </View>
       </View>
     )
   },
@@ -110,5 +111,16 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     color: '#DFD9B9',
     paddingTop: 2
+  },
+
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+
+  navText: {
+    textAlign: 'center',
+    color: '#DFD9B9',
+    fontSize: 18
   },
 });

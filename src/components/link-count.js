@@ -10,6 +10,8 @@ module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   componentDidMount: function() {
+    console.log('link-count days:', this.state.days);
+
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({days: habits[habits.length - 1].days});
     });
@@ -23,13 +25,18 @@ module.exports = React.createClass({
     });
 
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      this.setState({days: habits[habits.length - 1].days});
+      if (habits.length > 1) {
+        this.setState({days: habits[habits.length - 1].days});
+      } else {
+        this.setState({days: []});
+      }
+
     });
   },
 
   getInitialState: function() {
     return {
-      days: []
+      days: this.props.days
     }
   },
 
@@ -54,7 +61,7 @@ module.exports = React.createClass({
     }
 
     return (
-      <Text style={styles.days}>
+      <Text style={[styles.days, this.props.linkCountStyle]}>
         {checkedDays} link{checks.length == 1 ? '' : 's'} in the chain.
       </Text>
     )
@@ -65,6 +72,7 @@ var styles = StyleSheet.create({
   days: {
     padding: 10,
     color: '#DFD9B9',
-    fontSize: 16
+    fontSize: 16,
+    marginTop: 7
   },
 })
