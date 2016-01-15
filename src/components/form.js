@@ -25,15 +25,10 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'edit-habit', () => {
       this.setState({editHabit: true})
     });
-
-    // this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-    //   this.setState({habits: habits});
-    // });
   },
 
   saveHabit: function() {
     // Check this.state.habits for a habit.name matching this.state.text.
-    console.log('form this.state.habits:', this.state.habits);
     var habitIdx = this.state.habits.findIndex( (habit, index, habits) => {
       if (habit.name == this.state.text) {
         return true;
@@ -68,20 +63,6 @@ module.exports = React.createClass({
     this.props.events.emit('cancel-habit');
   },
 
-  // restartHabit: function() {
-  //   var habit = this.state.habits.pop();
-  //   habit.days = [];
-  //
-  //   var habits = this.state.habits
-  //   habits.push(habit);
-  //
-  //   this.setState({habits: habits, habit: habit, editHabit: false, checked: false}, () => {
-  //     store.save('habits', this.state.habits);
-  //     this.props.events.emit('got-habits', this.state.habits);
-  //     this.props.events.emit('chain-restarted');
-  //   });
-  // },
-
   render: function() {
     var input, save;
 
@@ -90,13 +71,11 @@ module.exports = React.createClass({
       input = <View></View>;
       save = <View></View>;
       cancel = <View></View>;
-      restart = <View></View>;
     } else {
       label = <Text style={styles.label}>Enter Habit</Text>;
       input = <TextInput style={styles.input} onChangeText={(text) => this.setState({text: text})} value={this.state.text} />;
       save =  <Button text={'Save'} onPress={this.saveHabit} textType={styles.saveText} buttonType={styles.saveButton} />;
       cancel =  <Button text={'Cancel'} onPress={this.cancelHabitEdit} />;
-      restart = <Button text={'Restart Chain'} onPress={this.restartHabit} textType={styles.restartText} buttonType={styles.restartButton} />;
     }
 
     return (
@@ -107,7 +86,6 @@ module.exports = React.createClass({
           {save}
           {cancel}
         </View>
-        {restart}
       </View>
     )
   }
@@ -126,7 +104,7 @@ var styles = StyleSheet.create({
   },
 
   formElement: {
-    backgroundColor: '#eeeeee',
+    backgroundColor: '#DFD9B9',
     margin: 5,
   },
 

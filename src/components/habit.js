@@ -4,6 +4,8 @@ var {
   Text,
   StyleSheet,
   TouchableWithoutFeedback,
+  TouchableHighlight,
+  ListView
 } = React;
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
@@ -32,10 +34,14 @@ module.exports = React.createClass({
   },
 
   getInitialState: function() {
+    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
     return {
       checked: false,
+      choosing: false,
       habit: {name: '', days: []},
       habits: [],
+      dataSource: ds.cloneWithRows([]),
     }
   },
 
@@ -49,7 +55,7 @@ module.exports = React.createClass({
       checked = this.checked(habit);
 
       if (this.isMounted()) {
-        this.setState({habit: habit, habits: data, checked: checked}, function() {
+        this.setState({habit: habit, habits: data, checked: checked, dataSource: this.state.dataSource.cloneWithRows(data)}, function() {
           this.props.events.emit('got-habits', this.state.habits);
         });
       }
@@ -75,6 +81,10 @@ module.exports = React.createClass({
   },
 
   addDay: function() {
+    if (this.state.choosing) {
+      this.setState({choosing: false});
+    }
+
     if (this.state.habit.name != '') {
       // Find out if there is an entry in days for today.
       var day = this.state.habit.days.findIndex(function(day, index, days) {
@@ -129,14 +139,58 @@ module.exports = React.createClass({
     }
   },
 
+  chooseHabit: function() {
+    this.setState({choosing: true});
+  },
+
+  habitSelected: function(habitIdx) {
+    var habits = this.state.habits;
+    var habit = habits.splice(habitIdx, 1);
+    habits.push(habit[0])
+    this.setState({habits: habits, habit: habits[habits.length -1], dataSource: this.state.dataSource.cloneWithRows(habits), choosing: false}, () => {
+      this.props.events.emit('new-habit', this.state.habits);
+      store.save('habits', this.state.habits);
+    })
+  },
+
   render: function() {
+    var habits;
+    if (this.state.choosing) {
+      habits = <View style={styles.habitsContainer}>
+        <View style={styles.habitsHeader}>
+          <Text style={styles.habitsHeaderText}>Choose a Habit</Text>
+        </View>
+        <View style={styles.habitsWrapper}>
+          <ListView
+              dataSource={this.state.dataSource}
+              renderRow={(rowData, sectionId, rowId) =>
+                <TouchableHighlight onPress={() => this.habitSelected(rowId)}>
+
+                  <View style={styles.habits}>
+                    <Text style={styles.habitsText}>{rowData.name ? rowData.name : ''}</Text>
+                  </View>
+                </TouchableHighlight>
+              }
+              renderSeparator={(sectionId, rowId, adjacentRowHighlighted) =>
+                <View style={styles.separator} key={rowId} />
+              }
+            />
+        </View>
+      </View>
+    } else {
+      habits = <View/>
+    }
+
     return (
-      <View style={styles.shadow}>
-        <TouchableWithoutFeedback onLongPress={this.editHabit} onPress={this.addDay}>
-          <View style={[styles.habit, this.state.checked && styles.checked]}>
-            <Text style={styles.habitText}>{this.state.habit && this.state.habit.name != '' ? this.state.habit.name : 'No habit configured...'}</Text>
-          </View>
-        </TouchableWithoutFeedback>
+      <View>
+        <View style={styles.shadow}>
+          <TouchableWithoutFeedback onLongPress={this.chooseHabit} onPress={this.addDay}>
+            <View style={[styles.habit, this.state.checked && styles.checked]}>
+              <Text style={styles.habitText}>{this.state.habit && this.state.habit.name != '' ? this.state.habit.name : 'No habit configured...'}</Text>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+        {habits}
       </View>
     )
   }
@@ -168,4 +222,51 @@ var styles = StyleSheet.create({
     backgroundColor: '#4D9E7E',
   },
 
+  habitsContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#DFD9B9',
+    borderWidth: 2,
+    borderColor: '#DFD9B9',
+    paddingLeft: 20,
+    paddingRight: 25,
+    paddingTop: 10,
+    paddingBottom: 25,
+    marginTop: 10
+  },
+
+  habitsHeader: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+
+  habitsHeaderText: {
+    fontSize: 19,
+    color: '#424242',
+  },
+
+  habitsWrapper: {
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+
+  habits: {
+    marginTop: 5,
+    paddingTop: 5,
+    paddingBottom: 10,
+    backgroundColor: '#DFD9B9',
+  },
+
+  habitsText: {
+    color: '#424242',
+    fontSize: 14,
+  },
+
+  separator: {
+    backgroundColor: '#424242',
+    width: 100,
+    padding: 1
+  }
 });

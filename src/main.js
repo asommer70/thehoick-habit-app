@@ -58,7 +58,7 @@ module.exports = React.createClass({
           <View style={styles.wrapper}>
             <Habit habits={this.state.habits} events={this.props.events}/>
 
-            <LinkCount days={this.state.habit.days} events={this.props.events}/>
+            <LinkCount days={this.state.habit ? this.state.habit.days : []} events={this.props.events}/>
           </View>
 
           <Chains habits={this.state.habits} events={this.props.events}/>

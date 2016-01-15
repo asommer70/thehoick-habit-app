@@ -54,14 +54,12 @@ module.exports = React.createClass({
 
   restartHabit: function(habitIdx) {
     var habits = this.state.habits;
-    console.log('habits:', habits);
     habits[habitIdx].days = [];
 
     this.setState({habits: habits, habit: habits[habits.length - 1], dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
       this.props.events.emit('got-habits', this.state.habits);
       this.props.events.emit('chain-restarted');
       store.save('habits', this.state.habits);
-      console.log('this.state.habits:', this.state.habits);
     });
   },
 

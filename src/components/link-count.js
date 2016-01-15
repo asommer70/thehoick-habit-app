@@ -10,8 +10,6 @@ module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   componentDidMount: function() {
-    console.log('link-count days:', this.state.days);
-
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({days: habits[habits.length - 1].days});
     });
