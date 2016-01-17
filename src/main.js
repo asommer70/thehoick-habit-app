@@ -7,7 +7,6 @@ var {
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
 var moment = require('moment');
-// var EventEmitter = require('EventEmitter');
 var Subscribable = require('Subscribable');
 
 var Habit = require('./components/habit');
@@ -19,17 +18,48 @@ module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   componentWillMount: function() {
-    // this.eventEmitter = new EventEmitter();
-
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
+
+    this.addListenerOn(this.props.events, 'new-habit', () => {
+      this.sendData();
+    });
+
+    this.addListenerOn(this.props.events, 'day-added', () => {
+      this.sendData();
+    });
+  },
+
+  componentDidMount: function() {
+    store.get('settings').then((data) => {
+      if (data === null) {
+        data = {};
+      }
+      this.setState({settings: data});
+    })
   },
 
   getInitialState: function() {
     return {
       habits: [],
       habit: {name: '', days: []},
+    }
+  },
+
+  sendData: function() {
+    if (this.state.settings.url !== undefined &&
+        this.state.settings.url != '' &&
+        this.state.settings.username !== undefined &&
+        this.state.settings.username != '') {
+      fetch(this.state.settings.url, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({username: this.state.settings.username, habits: this.state.habits})
+      })
     }
   },
 

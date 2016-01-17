@@ -4,14 +4,15 @@ var {
   View,
   ScrollView,
   StyleSheet,
-  ListView
+  ListView,
 } = React;
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
 
 var Button = require('./components/button');
-var Form = require('./components/form');
+var HabitForm = require('./components/habit-form');
 var LinkCount = require('./components/link-count');
+var IOSDate = require('./components/datepicker-ios');
 
 module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
@@ -63,6 +64,12 @@ module.exports = React.createClass({
     });
   },
 
+  addReminder: function(habitIdx) {
+    console.log('habits addReminder... habitIdx:', habitIdx);
+    // Open modal with Date Picker.
+    return <IOSDate />
+  },
+
   render: function() {
     return (
       <View style={styles.container}>
@@ -70,9 +77,10 @@ module.exports = React.createClass({
 
         <View style={styles.wrapper}>
           <Button text={'Add Habit'} onPress={this.editHabit} textType={styles.navText} buttonType={styles.navButton} />
-          <Form habits={this.state.habits} events={this.props.events}/>
+          <HabitForm habits={this.state.habits} events={this.props.events}/>
 
           <Text style={styles.heading}>Habits</Text>
+
           <View style={styles.hr}></View>
 
           <ListView
@@ -85,6 +93,7 @@ module.exports = React.createClass({
                 </View>
 
                 <View style={styles.habitButtons}>
+                  <Button text={'Add Reminder'} onPress={() => this.addReminder(rowId)} textType={styles.restartText} buttonType={styles.restartButton} />
                   <Button text={'Restart Chain'} onPress={() => this.restartHabit(rowId)} textType={styles.restartText} buttonType={styles.restartButton} />
                   <Button text={'Delete'} onPress={() => this.deleteHabit(rowId)} textType={styles.deleteText} buttonType={styles.deleteButton} />
                 </View>
@@ -164,15 +173,17 @@ var styles = StyleSheet.create({
     paddingLeft: 10
   },
 
-  habitButtons: {
-    alignSelf: 'flex-end',
+  row: {
     flexDirection: 'row',
-    marginLeft: 5
+  },
+
+  habitButtons: {
+    marginLeft: 45
   },
 
   deleteButton: {
     borderColor: '#CE4B41',
-    marginLeft: 1
+    marginTop: 3,
   },
 
   deleteText: {
@@ -183,12 +194,14 @@ var styles = StyleSheet.create({
   restartText: {
     textAlign: 'center',
     color: '#DFD9B9',
-    fontSize: 12
+    fontSize: 12,
   },
 
   restartButton: {
     borderColor: '#DFD9B9',
     borderRadius: 0,
-    marginRight: 1
+    marginRight: 1,
+    marginTop: 3,
+    marginBottom: 3
   },
 })
