@@ -28,8 +28,10 @@ module.exports = React.createClass({
       this.setState({habits: habits, habit: habit, checked: checked})
     });
 
-    this.addListenerOn(this.props.events, 'chain-restarted', () => {
-      this.setState({checked: false});
+    this.addListenerOn(this.props.events, 'chain-restarted', (data) => {
+      if (this.state.habit == data.habits[data.habitIdx]) {
+        this.setState({checked: false});
+      }
     });
   },
 
@@ -164,7 +166,7 @@ module.exports = React.createClass({
           <ListView
               dataSource={this.state.dataSource}
               renderRow={(rowData, sectionId, rowId) =>
-                <TouchableHighlight onPress={() => this.habitSelected(rowId)}>
+                <TouchableHighlight style={styles.habitButton} onPress={() => this.habitSelected(rowId)}>
 
                   <View style={styles.habits}>
                     <Text style={styles.habitsText}>{rowData.name ? rowData.name : ''}</Text>
@@ -268,5 +270,9 @@ var styles = StyleSheet.create({
     backgroundColor: '#424242',
     width: 100,
     padding: 1
+  },
+
+  habitButton: {
+    width: 100
   }
 });

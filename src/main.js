@@ -22,7 +22,12 @@ module.exports = React.createClass({
       this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
 
-    this.addListenerOn(this.props.events, 'new-habit', () => {
+    this.addListenerOn(this.props.events, 'new-habit', (habits) => {
+      if (habits.length > 1) {
+        this.setState({habit: habits[habits.length - 1]});
+      } else {
+        this.setState({habit: []});
+      }
       this.sendData();
     });
 
@@ -88,7 +93,7 @@ module.exports = React.createClass({
           <View style={styles.wrapper}>
             <Habit habits={this.state.habits} events={this.props.events}/>
 
-            <LinkCount days={this.state.habit ? this.state.habit.days : []} events={this.props.events}/>
+            <LinkCount habit={this.state.habit} events={this.props.events}/>
           </View>
 
           <Chains habits={this.state.habits} events={this.props.events}/>

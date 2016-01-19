@@ -10,44 +10,35 @@ module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   componentDidMount: function() {
-    this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-      this.setState({days: habits[habits.length - 1].days});
-    });
-
     this.addListenerOn(this.props.events, 'day-added', (habits) => {
-      this.setState({days: habits[habits.length - 1].days});
+      this.setState({habit: habits[habits.length - 1]});
     });
 
-    this.addListenerOn(this.props.events, 'chain-restarted', () => {
-      this.setState({days: []});
-    });
-
-    this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      if (habits.length > 1) {
-        this.setState({days: habits[habits.length - 1].days});
-      } else {
-        this.setState({days: []});
-      }
-
-    });
+    // this.addListenerOn(this.props.events, 'new-habit', (habits) => {
+    //   if (habits.length > 1) {
+    //     this.setState({habit: habits[habits.length - 1]});
+    //   } else {
+    //     this.setState({habit: []});
+    //   }
+    // });
   },
 
   getInitialState: function() {
     return {
-      days: this.props.days
+      habit: {name: '', days: []}
     }
   },
 
   render: function() {
     var checkedDays;
     var checks;
-    if (this.state.days.length >= 1) {
+    if (this.props.habit.days.length >= 1) {
 
       // Need an array of checked days starting with today going back to the first unchecked day.
       checks = [];
-      for (var i = this.state.days.length; i > 0; i--) {
-        if (this.state.days[i - 1].checked) {
-          checks.push(this.state.days[i]);
+      for (var i = this.props.habit.days.length; i > 0; i--) {
+        if (this.props.habit.days[i - 1].checked) {
+          checks.push(this.props.habit.days[i]);
         } else {
           break;
         }

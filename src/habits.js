@@ -4,10 +4,11 @@ var {
   View,
   ScrollView,
   StyleSheet,
-  ListView,
+  Modal
 } = React;
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
+var moment = require('moment');
 
 var Button = require('./components/button');
 var HabitForm = require('./components/habit-form');
@@ -17,20 +18,52 @@ var IOSDate = require('./components/datepicker-ios');
 module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
-  componentDidMount: function() {
-    this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      console.log('habits new-habit event... habits:', habits);
-      this.setState({habits: habits, habit: habits[habits.length - 1], dataSource: this.state.dataSource.cloneWithRows(habits)})
+  componentWillMount: function() {
+    this.addListenerOn(this.props.events, 'date-picked', (date) => {
+      console.log('habits date-picked event... date:', date);
+      console.log('habits date-picked event... date:', date.get);
+
+      var habits = this.state.habits;
+      var momentDate = moment(date.toISOString());
+
+      habits[this.state.habitReminderIdx].reminder = momentDate.format('HH:MM:SS');
+
+      this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
+        store.save('habits', this.state.habits);
+        this.props.events.emit('new-habit', this.state.habits);
+      });
+
+      // Set the habit from the Date Picker.
     });
   },
 
+  componentDidMount: function() {
+    this.addListenerOn(this.props.events, 'new-habit', (habits) => {
+      console.log('habits new-habit event... habits:', habits);
+      this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits)})
+    });
+
+    // this.setState({dataSource: this.state.dataSource.cloneWithRows(this.state.habits)})
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+      this.setState({
+          dataSource: this.state.dataSource.cloneWithRows( nextProps.data )
+      });
+  },
+
   getInitialState: function() {
-    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    // var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => {console.log('row has changed... r1:', r1, 'r2:', r2); r1 !== r2}});
+    //var ds = new ListView.DataSource({rowHasChanged: (row1, row2) => true});
 
     return {
       habits: this.props.habits,
-      habit: this.props.habits[this.props.habits.length - 1],
-      dataSource: ds.cloneWithRows(this.props.habits),
+      //dataSource: ds.cloneWithRows(this.props.habits),
+      // dataSource: new ListView.DataSource({
+      //   rowHasChanged: (row1, row2) => row1 !== row2,
+      // }),
+      modalVisible: false,
+      habitReminderIdx: null,
     }
   },
 
@@ -47,7 +80,7 @@ module.exports = React.createClass({
     habits.splice(habitIdx, 1);
 
     // Save the new Habits.
-    this.setState({habits: habits, habit: habits[habits.length - 1], dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
+    this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
       this.props.events.emit('new-habit', this.state.habits);
       store.save('habits', this.state.habits);
     })
@@ -57,9 +90,8 @@ module.exports = React.createClass({
     var habits = this.state.habits;
     habits[habitIdx].days = [];
 
-    this.setState({habits: habits, habit: habits[habits.length - 1], dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
-      this.props.events.emit('got-habits', this.state.habits);
-      this.props.events.emit('chain-restarted');
+    this.setState({habits: habits}, () => {
+      this.props.events.emit('chain-restarted', {habits: habits, habitIdx: habitIdx});
       store.save('habits', this.state.habits);
     });
   },
@@ -68,6 +100,49 @@ module.exports = React.createClass({
     console.log('habits addReminder... habitIdx:', habitIdx);
     // Open modal with Date Picker.
     return <IOSDate />
+  },
+
+  openModal: function(habitIdx) {
+    console.log('habits openModal... habitIdx:', habitIdx);
+    this.setState({modalVisible: true, habitReminderIdx: habitIdx})
+  },
+
+  closeModal: function(visible) {
+    console.log('habits closeModal... this.state.habitReminderIdx:', this.state.habitReminderIdx);
+    this.setState({modalVisible: visible});
+  },
+
+  removeReminder: function(visible) {
+    console.log('habits closeModal... this.state.habitReminderIdx:', this.state.habitReminderIdx);
+
+    var habits = this.state.habits;
+    habits[this.state.habitReminderIdx].reminder = null;
+
+    this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits), modalVisible: visible}, () => {
+      store.save('habits', this.state.habits);
+      this.props.events.emit('new-habit', this.state.habits);
+    });
+  },
+
+  habitComponents: function() {
+    var habits = this.state.habits.map((habit, index) => {
+      return (
+        <View style={styles.habits} key={index}>
+          <View style={styles.habitInfo}>
+            <Text style={styles.habitText}>{habit.name ? habit.name : ''}</Text>
+            <LinkCount habit={habit} linkCountStyle={styles.linkCountText} events={this.props.events}/>
+            <Text style={styles.linkCountText}>Render at: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
+          </View>
+
+          <View style={styles.habitButtons}>
+            <Button text={'Set Reminder'} onPress={() => this.openModal(index)} textType={styles.restartText} buttonType={styles.restartButton} />
+            <Button text={'Restart Chain'} onPress={() => this.restartHabit(index)} textType={styles.restartText} buttonType={styles.restartButton} />
+            <Button text={'Delete'} onPress={() => this.deleteHabit(index)} textType={styles.deleteText} buttonType={styles.deleteButton} />
+          </View>
+        </View>
+      )
+    });
+    return habits;
   },
 
   render: function() {
@@ -83,24 +158,24 @@ module.exports = React.createClass({
 
           <View style={styles.hr}></View>
 
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={(rowData, sectionId, rowId) =>
-              <View style={styles.habits}>
-                <View style={styles.habitInfo}>
-                  <Text style={styles.habitText}>{rowData.name ? rowData.name : ''}</Text>
-                  <LinkCount days={rowData.days} linkCountStyle={styles.linkCountText} events={this.props.events}/>
-                </View>
+          <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
 
-                <View style={styles.habitButtons}>
-                  <Button text={'Add Reminder'} onPress={() => this.addReminder(rowId)} textType={styles.restartText} buttonType={styles.restartButton} />
-                  <Button text={'Restart Chain'} onPress={() => this.restartHabit(rowId)} textType={styles.restartText} buttonType={styles.restartButton} />
-                  <Button text={'Delete'} onPress={() => this.deleteHabit(rowId)} textType={styles.deleteText} buttonType={styles.deleteButton} />
-                </View>
-              </View>
-            }
-          />
+            {this.habitComponents()}
+
+          </ScrollView>
         </View>
+        <Modal
+          animated={true}
+          transparent={false}
+          visible={this.state.modalVisible}>
+          <View style={styles.modal}>
+            <View style={[styles.innerContainer]}>
+              <IOSDate events={this.props.events} />
+              <Button text={'Set Time'} onPress={this.closeModal.bind(this, false)} textType={styles.restartText} buttonType={styles.restartButton} />
+              <Button text={'Remove Reminder'} onPress={this.removeReminder.bind(this, false)} textType={styles.deleteText} buttonType={styles.deleteButton} />
+            </View>
+          </View>
+        </Modal>
       </View>
     )
   }
@@ -203,5 +278,10 @@ var styles = StyleSheet.create({
     marginRight: 1,
     marginTop: 3,
     marginBottom: 3
+  },
+
+  modal: {
+    paddingTop: 25,
+    backgroundColor: '#045491',
   },
 })

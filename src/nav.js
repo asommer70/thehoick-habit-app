@@ -23,7 +23,10 @@ module.exports = React.createClass({
     this.eventEmitter = new EventEmitter();
 
     this.addListenerOn(this.eventEmitter, 'got-habits', (habits) => {
-      this.setState({habits: habits});
+      console.log('nav got-habits event...:', habits);
+      this.setState({habits: habits}, () => {
+        console.log('nav this.state.habits:', this.state.habits);
+      });
     });
   },
 

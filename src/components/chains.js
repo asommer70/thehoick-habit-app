@@ -22,8 +22,10 @@ module.exports = React.createClass({
       this.setState({habit: habit, days: habit.days});
     });
 
-    this.addListenerOn(this.props.events, 'chain-restarted', () => {
-      this.setState({days: []});
+    this.addListenerOn(this.props.events, 'chain-restarted', (data) => {
+      if (this.state.habit == data.habits[data.habitIdx]) {
+        this.setState({days: []});
+      }
     });
 
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
