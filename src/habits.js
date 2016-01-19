@@ -43,10 +43,8 @@ module.exports = React.createClass({
 
       // Search for the Reminder.
       RNCalendarReminders.fetchAllReminders(reminders => {
-        console.log('remidners:', reminders);
-
         // Find the Reminder ID.
-        var reminderId = false;
+        var reminderId;
         for (var i = 0; i < reminders.length; i++) {
           if (reminders[i].title == habit.name) {
             reminderId = reminders[i].id;
@@ -55,7 +53,8 @@ module.exports = React.createClass({
         }
 
         // Update the Reminder, or create a new one.
-        if (reminderId) {
+        console.log('reminderId:', reminderId);
+        if (reminderId !== undefined) {
           RNCalendarReminders.saveReminder(habit.name, {
             id: reminders[i].id,
             location: '',
@@ -145,8 +144,6 @@ module.exports = React.createClass({
   },
 
   removeReminder: function(visible) {
-    console.log('habits closeModal... this.state.habitReminderIdx:', this.state.habitReminderIdx);
-
     var habits = this.state.habits;
     habits[this.state.habitReminderIdx].reminder = null;
 
@@ -156,6 +153,16 @@ module.exports = React.createClass({
     });
 
     // Remove the Reminder from iOS.
+    RNCalendarReminders.fetchAllReminders(reminders => {
+      console.log('this.state.habits[habitReminderIdx]:', this.state.habits[this.state.habitReminderIdx]);
+      for (var i = 0; i < reminders.length; i++) {
+        if (reminders[i].title == this.state.habits[this.state.habitReminderIdx].name) {
+          console.log('removeReminder reminder.id:', reminders[i].id);
+          RNCalendarReminders.removeReminder(reminders[i].id);
+          // break;
+        }
+      }
+    });
   },
 
   habitComponents: function() {
