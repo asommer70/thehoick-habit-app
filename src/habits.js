@@ -4,7 +4,8 @@ var {
   View,
   ScrollView,
   StyleSheet,
-  Modal
+  Modal,
+  TouchableHighlight
 } = React;
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
@@ -40,7 +41,7 @@ module.exports = React.createClass({
   componentDidMount: function() {
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
       console.log('habits new-habit event... habits:', habits);
-      this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits)})
+      this.setState({habits: habits})
     });
 
     // this.setState({dataSource: this.state.dataSource.cloneWithRows(this.state.habits)})
@@ -96,6 +97,17 @@ module.exports = React.createClass({
     });
   },
 
+  habitSelected: function(habitIdx) {
+    var habits = this.state.habits;
+    var habit = habits.splice(habitIdx, 1);
+    habits.push(habit[0])
+    this.setState({habits: habits, habit: habits[habits.length -1]}, () => {
+      this.props.events.emit('new-habit', this.state.habits);
+      store.save('habits', this.state.habits);
+      this.props.navigator.pop();
+    })
+  },
+
   addReminder: function(habitIdx) {
     console.log('habits addReminder... habitIdx:', habitIdx);
     // Open modal with Date Picker.
@@ -129,7 +141,9 @@ module.exports = React.createClass({
       return (
         <View style={styles.habits} key={index}>
           <View style={styles.habitInfo}>
-            <Text style={styles.habitText}>{habit.name ? habit.name : ''}</Text>
+            <TouchableHighlight style={styles.habitButton} onPress={() => this.habitSelected(index)}>
+              <Text style={styles.habitText}>{habit.name ? habit.name : ''}</Text>
+            </TouchableHighlight>
             <LinkCount habit={habit} linkCountStyle={styles.linkCountText} events={this.props.events}/>
             <Text style={styles.linkCountText}>Render at: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
           </View>
