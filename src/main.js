@@ -37,6 +37,7 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function() {
+    console.log('React:', React.Platform.OS);
     store.get('settings').then((data) => {
       if (data === null) {
         data = {};

@@ -21,20 +21,18 @@ module.exports = React.createClass({
 
   componentWillMount: function() {
     this.addListenerOn(this.props.events, 'date-picked', (date) => {
-      console.log('habits date-picked event... date:', date);
-      console.log('habits date-picked event... date:', date.get);
-
       var habits = this.state.habits;
-      var momentDate = moment(date.toISOString());
+      var momentDate = moment(date);
 
-      habits[this.state.habitReminderIdx].reminder = momentDate.format('HH:MM:SS');
+      habits[this.state.habitReminderIdx].reminder = momentDate.format('hh:mm');
 
-      this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
+      this.setState({habits: habits}, () => {
         store.save('habits', this.state.habits);
         this.props.events.emit('new-habit', this.state.habits);
       });
 
       // Set the habit from the Date Picker.
+      // console.log('device:', React.Platform.OS);
     });
   },
 
@@ -43,26 +41,11 @@ module.exports = React.createClass({
       console.log('habits new-habit event... habits:', habits);
       this.setState({habits: habits})
     });
-
-    // this.setState({dataSource: this.state.dataSource.cloneWithRows(this.state.habits)})
-  },
-
-  componentWillReceiveProps: function(nextProps) {
-      this.setState({
-          dataSource: this.state.dataSource.cloneWithRows( nextProps.data )
-      });
   },
 
   getInitialState: function() {
-    // var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => {console.log('row has changed... r1:', r1, 'r2:', r2); r1 !== r2}});
-    //var ds = new ListView.DataSource({rowHasChanged: (row1, row2) => true});
-
     return {
       habits: this.props.habits,
-      //dataSource: ds.cloneWithRows(this.props.habits),
-      // dataSource: new ListView.DataSource({
-      //   rowHasChanged: (row1, row2) => row1 !== row2,
-      // }),
       modalVisible: false,
       habitReminderIdx: null,
     }
@@ -108,12 +91,6 @@ module.exports = React.createClass({
     })
   },
 
-  addReminder: function(habitIdx) {
-    console.log('habits addReminder... habitIdx:', habitIdx);
-    // Open modal with Date Picker.
-    return <IOSDate />
-  },
-
   openModal: function(habitIdx) {
     console.log('habits openModal... habitIdx:', habitIdx);
     this.setState({modalVisible: true, habitReminderIdx: habitIdx})
@@ -130,7 +107,7 @@ module.exports = React.createClass({
     var habits = this.state.habits;
     habits[this.state.habitReminderIdx].reminder = null;
 
-    this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits), modalVisible: visible}, () => {
+    this.setState({habits: habits, modalVisible: visible}, () => {
       store.save('habits', this.state.habits);
       this.props.events.emit('new-habit', this.state.habits);
     });
@@ -159,6 +136,12 @@ module.exports = React.createClass({
     return habits;
   },
 
+  iosDatePicker: function() {
+    return (
+      <IOSDate events={this.props.events} />
+    )
+  },
+
   render: function() {
     return (
       <View style={styles.container}>
@@ -173,9 +156,7 @@ module.exports = React.createClass({
           <View style={styles.hr}></View>
 
           <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
-
             {this.habitComponents()}
-
           </ScrollView>
         </View>
         <Modal
@@ -184,7 +165,7 @@ module.exports = React.createClass({
           visible={this.state.modalVisible}>
           <View style={styles.modal}>
             <View style={[styles.innerContainer]}>
-              <IOSDate events={this.props.events} />
+              {React.Platform.OS == 'ios' ? <IOSDate events={this.props.events} /> : <View/>}
               <Button text={'Set Time'} onPress={this.closeModal.bind(this, false)} textType={styles.restartText} buttonType={styles.restartButton} />
               <Button text={'Remove Reminder'} onPress={this.removeReminder.bind(this, false)} textType={styles.deleteText} buttonType={styles.deleteButton} />
             </View>
