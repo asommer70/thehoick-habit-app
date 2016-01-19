@@ -10,6 +10,7 @@ var {
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
 var moment = require('moment');
+var RNCalendarReminders = require('react-native-calendar-reminders');
 
 var Button = require('./components/button');
 var HabitForm = require('./components/habit-form');
@@ -33,6 +34,48 @@ module.exports = React.createClass({
 
       // Set the habit from the Date Picker.
       // console.log('device:', React.Platform.OS);
+      // console.log('RNCalendarReminders:', RNCalendarReminders);
+      RNCalendarReminders.authorizeEventStore((error, auth) => {
+        console.log('authorizing EventStore...');
+      });
+
+      var habit = this.state.habits[this.state.habits.length - 1];
+
+      // Search for the Reminder.
+      RNCalendarReminders.fetchAllReminders(reminders => {
+        console.log('remidners:', reminders);
+
+        // Find the Reminder ID.
+        var reminderId = false;
+        for (var i = 0; i < reminders.length; i++) {
+          if (reminders[i].title == habit.name) {
+            reminderId = reminders[i].id;
+            break;
+          }
+        }
+
+        // Update the Reminder, or create a new one.
+        if (reminderId) {
+          RNCalendarReminders.saveReminder(habit.name, {
+            id: reminders[i].id,
+            location: '',
+            notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
+            startDate: date,
+            alarms: [{
+              date: -1 // or absolute date
+            }]
+          });
+        } else {
+          RNCalendarReminders.saveReminder(habit.name, {
+            location: '',
+            notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
+            startDate: date,
+            alarms: [{
+              date: -1 // or absolute date
+            }]
+          });
+        }
+      });
     });
   },
 
@@ -111,6 +154,8 @@ module.exports = React.createClass({
       store.save('habits', this.state.habits);
       this.props.events.emit('new-habit', this.state.habits);
     });
+
+    // Remove the Reminder from iOS.
   },
 
   habitComponents: function() {
@@ -122,7 +167,7 @@ module.exports = React.createClass({
               <Text style={styles.habitText}>{habit.name ? habit.name : ''}</Text>
             </TouchableHighlight>
             <LinkCount habit={habit} linkCountStyle={styles.linkCountText} events={this.props.events}/>
-            <Text style={styles.linkCountText}>Render at: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
+            <Text style={styles.linkCountText}>Reminder: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
           </View>
 
           <View style={styles.habitButtons}>
