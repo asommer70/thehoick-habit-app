@@ -33,8 +33,6 @@ module.exports = React.createClass({
       });
 
       // Set the habit from the Date Picker.
-      // console.log('device:', React.Platform.OS);
-      // console.log('RNCalendarReminders:', RNCalendarReminders);
       RNCalendarReminders.authorizeEventStore((error, auth) => {
         console.log('authorizing EventStore...');
       });
@@ -44,7 +42,6 @@ module.exports = React.createClass({
       // Search for the Reminder.
       RNCalendarReminders.fetchAllReminders(reminders => {
         // Find the Reminder ID.
-        console.log('reminders:', reminders);
         var reminderId;
         for (var i = 0; i < reminders.length; i++) {
           if (reminders[i].title == habit.name) {
@@ -54,7 +51,6 @@ module.exports = React.createClass({
         }
 
         // Update the Reminder, or create a new one.
-        console.log('reminderId:', reminderId);
         if (reminderId !== undefined) {
           RNCalendarReminders.saveReminder(habit.name, {
             id: reminders[i].id,
@@ -83,7 +79,6 @@ module.exports = React.createClass({
 
   componentDidMount: function() {
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      console.log('habits new-habit event... habits:', habits);
       this.setState({habits: habits})
     });
   },
@@ -137,12 +132,10 @@ module.exports = React.createClass({
   },
 
   openModal: function(habitIdx) {
-    console.log('habits openModal... habitIdx:', habitIdx);
     this.setState({modalVisible: true, habitReminderIdx: habitIdx})
   },
 
   closeModal: function(visible) {
-    console.log('habits closeModal... this.state.habitReminderIdx:', this.state.habitReminderIdx);
     this.setState({modalVisible: visible});
   },
 
@@ -157,12 +150,9 @@ module.exports = React.createClass({
 
     // Remove the Reminder from iOS.
     RNCalendarReminders.fetchAllReminders(reminders => {
-      console.log('this.state.habits[habitReminderIdx]:', this.state.habits[this.state.habitReminderIdx]);
       for (var i = 0; i < reminders.length; i++) {
         if (reminders[i].title == this.state.habits[this.state.habitReminderIdx].name) {
-          console.log('removeReminder reminder.id:', reminders[i].id);
           RNCalendarReminders.removeReminder(reminders[i].id);
-          // break;
         }
       }
     });
