@@ -44,6 +44,7 @@ module.exports = React.createClass({
       // Search for the Reminder.
       RNCalendarReminders.fetchAllReminders(reminders => {
         // Find the Reminder ID.
+        console.log('reminders:', reminders);
         var reminderId;
         for (var i = 0; i < reminders.length; i++) {
           if (reminders[i].title == habit.name) {
@@ -63,7 +64,7 @@ module.exports = React.createClass({
             alarms: [{
               date: -1 // or absolute date
             }],
-            recurrence: 'weekly'
+            recurrence: 'daily'
           });
         } else {
           RNCalendarReminders.saveReminder(habit.name, {
@@ -73,7 +74,7 @@ module.exports = React.createClass({
             alarms: [{
               date: -1 // or absolute date
             }],
-            recurrence: 'weekly'
+            recurrence: 'daily'
           });
         }
       });
