@@ -62,7 +62,8 @@ module.exports = React.createClass({
             startDate: date,
             alarms: [{
               date: -1 // or absolute date
-            }]
+            }],
+            recurrence: 'weekly'
           });
         } else {
           RNCalendarReminders.saveReminder(habit.name, {
@@ -71,7 +72,8 @@ module.exports = React.createClass({
             startDate: date,
             alarms: [{
               date: -1 // or absolute date
-            }]
+            }],
+            recurrence: 'weekly'
           });
         }
       });
