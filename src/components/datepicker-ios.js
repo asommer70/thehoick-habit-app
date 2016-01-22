@@ -25,7 +25,7 @@ module.exports = React.createClass({
   onDateChange: function(date) {
     console.log('datepicker-ios onDateChange... date:', date);
     this.setState({date: date});
-    this.props.events.emit('date-picked', date);
+    this.props.events.emit('date-changed', date);
   },
 
   render: function() {

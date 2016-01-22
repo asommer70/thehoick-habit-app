@@ -87,7 +87,7 @@ module.exports = React.createClass({
       this.setState({choosing: false});
     }
 
-    if (this.state.habit.name != '') {
+    if (this.state.habit !== undefined && this.state.habit.name != '') {
       // Find out if there is an entry in days for today.
       var day = this.state.habit.days.findIndex(function(day, index, days) {
         if (day.dayId == dayKey) {
@@ -169,7 +169,7 @@ module.exports = React.createClass({
                 <TouchableHighlight style={styles.habitButton} onPress={() => this.habitSelected(rowId)}>
 
                   <View style={styles.habits}>
-                    <Text style={styles.habitsText}>{rowData.name ? rowData.name : ''}</Text>
+                    <Text style={styles.habitsText}>{rowData && rowData.name ? rowData.name : ''}</Text>
                   </View>
                 </TouchableHighlight>
               }

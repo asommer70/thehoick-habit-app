@@ -31,7 +31,7 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
       var habit = habits[habits.length - 1];
 
-      if (habits.length > 1) {
+      if (habits.length >= 1) {
         this.setState({habit: habit, days: habit.days});
       } else {
         this.setState({habit: {name: '', days: []}, days: []});

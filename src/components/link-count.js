@@ -13,14 +13,6 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'day-added', (habits) => {
       this.setState({habit: habits[habits.length - 1]});
     });
-
-    // this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-    //   if (habits.length > 1) {
-    //     this.setState({habit: habits[habits.length - 1]});
-    //   } else {
-    //     this.setState({habit: []});
-    //   }
-    // });
   },
 
   getInitialState: function() {
@@ -32,7 +24,8 @@ module.exports = React.createClass({
   render: function() {
     var checkedDays;
     var checks;
-    if (this.props.habit.days.length >= 1) {
+    console.log('this.props.habit:', this.props.habit);
+    if (this.props.habit && this.props.habit.days.length >= 1) {
 
       // Need an array of checked days starting with today going back to the first unchecked day.
       checks = [];

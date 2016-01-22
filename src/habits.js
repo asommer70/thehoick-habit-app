@@ -21,15 +21,20 @@ module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
 
   componentWillMount: function() {
-    this.addListenerOn(this.props.events, 'date-picked', (date) => {
-      var habits = this.state.habits;
-      var momentDate = moment(date);
+    this.addListenerOn(this.props.events, 'date-changed', (date) => {
+      this.setState({chosenDate: date})
+    });
+
+    this.addListenerOn(this.props.events, 'date-picked', () => {
+      // var date = this.state.chosenDate;
+      var habits = this.props.habits;
+      var momentDate = moment(this.state.chosenDate);
 
       habits[this.state.habitReminderIdx].reminder = momentDate.format('hh:mm');
 
       this.setState({habits: habits}, () => {
-        store.save('habits', this.state.habits);
-        this.props.events.emit('new-habit', this.state.habits);
+        store.save('habits', this.props.habits);
+        this.props.events.emit('new-habit', this.props.habits);
       });
 
       // Set the habit from the Date Picker.
@@ -37,7 +42,7 @@ module.exports = React.createClass({
         console.log('authorizing EventStore...');
       });
 
-      var habit = this.state.habits[this.state.habits.length - 1];
+      var habit = this.props.habits[this.props.habits.length - 1];
 
       // Search for the Reminder.
       RNCalendarReminders.fetchAllReminders(reminders => {
@@ -56,7 +61,7 @@ module.exports = React.createClass({
             id: reminders[i].id,
             location: '',
             notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
-            startDate: date,
+            startDate: this.state.chosenDate,
             alarms: [{
               date: -1 // or absolute date
             }],
@@ -66,7 +71,7 @@ module.exports = React.createClass({
           RNCalendarReminders.saveReminder(habit.name, {
             location: '',
             notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
-            startDate: date,
+            startDate: this.state.chosenDate,
             alarms: [{
               date: -1 // or absolute date
             }],
@@ -81,11 +86,13 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
       this.setState({habits: habits})
     });
+
+    console.log('habits this.props.habits:', this.props.habits);
   },
 
   getInitialState: function() {
     return {
-      habits: this.props.habits,
+      // habits: this.props.habits,
       modalVisible: false,
       habitReminderIdx: null,
     }
@@ -100,33 +107,41 @@ module.exports = React.createClass({
   },
 
   deleteHabit: function(habitIdx) {
-    var habits = this.state.habits;
-    habits.splice(habitIdx, 1);
+    var habits = this.props.habits;
+    var habit = habits.splice(habitIdx, 1);
+
+    RNCalendarReminders.fetchAllReminders(reminders => {
+      for (var i = 0; i < reminders.length; i++) {
+        if (reminders[i].title == habit[0].name) {
+          RNCalendarReminders.removeReminder(reminders[i].id);
+        }
+      }
+    });
 
     // Save the new Habits.
-    this.setState({habits: habits, dataSource: this.state.dataSource.cloneWithRows(habits)}, () => {
-      this.props.events.emit('new-habit', this.state.habits);
-      store.save('habits', this.state.habits);
+    this.setState({habits: habits}, () => {
+      this.props.events.emit('new-habit', this.props.habits);
+      store.save('habits', this.props.habits);
     })
   },
 
   restartHabit: function(habitIdx) {
-    var habits = this.state.habits;
+    var habits = this.props.habits;
     habits[habitIdx].days = [];
 
     this.setState({habits: habits}, () => {
       this.props.events.emit('chain-restarted', {habits: habits, habitIdx: habitIdx});
-      store.save('habits', this.state.habits);
+      store.save('habits', this.props.habits);
     });
   },
 
   habitSelected: function(habitIdx) {
-    var habits = this.state.habits;
+    var habits = this.props.habits;
     var habit = habits.splice(habitIdx, 1);
     habits.push(habit[0])
     this.setState({habits: habits, habit: habits[habits.length -1]}, () => {
-      this.props.events.emit('new-habit', this.state.habits);
-      store.save('habits', this.state.habits);
+      this.props.events.emit('new-habit', this.props.habits);
+      store.save('habits', this.props.habits);
       this.props.navigator.pop();
     })
   },
@@ -137,21 +152,22 @@ module.exports = React.createClass({
 
   closeModal: function(visible) {
     this.setState({modalVisible: visible});
+    this.props.events.emit('date-picked');
   },
 
   removeReminder: function(visible) {
-    var habits = this.state.habits;
+    var habits = this.props.habits;
     habits[this.state.habitReminderIdx].reminder = null;
 
     this.setState({habits: habits, modalVisible: visible}, () => {
-      store.save('habits', this.state.habits);
-      this.props.events.emit('new-habit', this.state.habits);
+      store.save('habits', this.props.habits);
+      this.props.events.emit('new-habit', this.props.habits);
     });
 
     // Remove the Reminder from iOS.
     RNCalendarReminders.fetchAllReminders(reminders => {
       for (var i = 0; i < reminders.length; i++) {
-        if (reminders[i].title == this.state.habits[this.state.habitReminderIdx].name) {
+        if (reminders[i].title == this.props.habits[this.state.habitReminderIdx].name) {
           RNCalendarReminders.removeReminder(reminders[i].id);
         }
       }
@@ -159,7 +175,7 @@ module.exports = React.createClass({
   },
 
   habitComponents: function() {
-    var habits = this.state.habits.map((habit, index) => {
+    var habits = this.props.habits.map((habit, index) => {
       return (
         <View style={styles.habits} key={index}>
           <View style={styles.habitInfo}>
@@ -194,7 +210,7 @@ module.exports = React.createClass({
 
         <View style={styles.wrapper}>
           <Button text={'Add Habit'} onPress={this.editHabit} textType={styles.navText} buttonType={styles.navButton} />
-          <HabitForm habits={this.state.habits} events={this.props.events}/>
+          <HabitForm habits={this.props.habits} events={this.props.events}/>
 
           <Text style={styles.heading}>Habits</Text>
 

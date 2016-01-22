@@ -23,10 +23,11 @@ module.exports = React.createClass({
     });
 
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      if (habits.length > 1) {
+      console.log('main new-habit event... habits:', habits);
+      if (habits.length >= 1) {
         this.setState({habit: habits[habits.length - 1]});
       } else {
-        this.setState({habit: []});
+        this.setState({habit: {name: '', days: [], reminder: ''}});
       }
       this.sendData();
     });
