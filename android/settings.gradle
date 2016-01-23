@@ -1,4 +1,5 @@
 rootProject.name = 'thehoick.habit_app'
 
-include ':react-native-share', ':app'
+include ':react-native-share', ':reactdate', ':app'
 project(':react-native-share').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-share/android')
+project(':reactdate').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-date')

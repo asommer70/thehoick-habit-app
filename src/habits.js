@@ -5,17 +5,20 @@ var {
   ScrollView,
   StyleSheet,
   Modal,
-  TouchableHighlight
+  TouchableHighlight,
+  NativeModules
 } = React;
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
 var moment = require('moment');
 var RNCalendarReminders = require('react-native-calendar-reminders');
+import Popup from 'react-native-popup';
 
 var Button = require('./components/button');
 var HabitForm = require('./components/habit-form');
 var LinkCount = require('./components/link-count');
 var IOSDate = require('./components/datepicker-ios');
+var AndroidDate = require('./components/datepicker-android');
 
 module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
@@ -110,13 +113,15 @@ module.exports = React.createClass({
     var habits = this.props.habits;
     var habit = habits.splice(habitIdx, 1);
 
-    RNCalendarReminders.fetchAllReminders(reminders => {
-      for (var i = 0; i < reminders.length; i++) {
-        if (reminders[i].title == habit[0].name) {
-          RNCalendarReminders.removeReminder(reminders[i].id);
+    if (React.Platform.OS == 'ios') {
+      RNCalendarReminders.fetchAllReminders(reminders => {
+        for (var i = 0; i < reminders.length; i++) {
+          if (reminders[i].title == habit[0].name) {
+            RNCalendarReminders.removeReminder(reminders[i].id);
+          }
         }
-      }
-    });
+      });
+    }
 
     // Save the new Habits.
     this.setState({habits: habits}, () => {
@@ -147,7 +152,30 @@ module.exports = React.createClass({
   },
 
   openModal: function(habitIdx) {
-    this.setState({modalVisible: true, habitReminderIdx: habitIdx})
+    console.log('habits openModal... habitIdx:', habitIdx);
+    if (React.Platform.OS == 'ios') {
+      this.setState({modalVisible: true, habitReminderIdx: habitIdx})
+    } else {
+      // this.popup.alert(1, 'beans...');
+      // this.popup.tip({
+      //     title: 'Choose Reminder Time',
+      //     content: <AndroidDate events={this.props.events} />,
+      // });
+      //return <AndroidDate events={this.props.events} />
+        NativeModules.DateAndroid.showTimepicker(function() {}, (hour, minute) => {
+          console.log(hour + ":" + minute);
+          // this.props.events.emit('date-changed', hour + ":" + minute);
+
+          var habits = this.props.habits;
+          // var momentDate = moment(this.state.chosenDate);
+
+          habits[habitIdx].reminder = hour + ":" + minute;
+          this.setState({habits: habits}, () => {
+            store.save('habits', this.props.habits);
+            this.props.events.emit('new-habit', this.props.habits);
+          });
+        });
+    }
   },
 
   closeModal: function(visible) {
@@ -173,6 +201,11 @@ module.exports = React.createClass({
       }
     });
   },
+
+  // onPressHandle: function() {
+  //     // alert
+  //     this.popup.alert(1, 'two');
+  // },
 
   habitComponents: function() {
     var habits = this.props.habits.map((habit, index) => {
@@ -220,6 +253,8 @@ module.exports = React.createClass({
             {this.habitComponents()}
           </ScrollView>
         </View>
+        <Popup ref={(popup) => { this.popup = popup }}/>
+
         <Modal
           animated={true}
           transparent={false}

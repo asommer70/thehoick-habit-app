@@ -16,11 +16,11 @@
 #define TIMEOUT_SECONDS 240
 #define TEXT_TO_LOOK_FOR @"Welcome to React Native!"
 
-@interface thehoick_habit_appTests : XCTestCase
+@interface thehoick.habit_appTests : XCTestCase
 
 @end
 
-@implementation thehoick_habit_appTests
+@implementation thehoick.habit_appTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
 {
