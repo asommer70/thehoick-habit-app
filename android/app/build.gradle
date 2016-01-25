@@ -77,4 +77,5 @@ dependencies {
     compile "com.facebook.react:react-native:0.18.+"
     compile project(':react-native-share')
     compile project(':reactdate')
+    compile project(':RNSendIntentModule')
 }

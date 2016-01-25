@@ -11,6 +11,7 @@
     "react-native-calendar-reminders": "0.0.3",
     "react-native-date": "nucleartux/react-native-date",
     "react-native-popup": "^0.5.2",
+    "react-native-send-intent": "^1.0.4",
     "react-native-share": "lifuzu/react-native-share",
     "react-native-simple-store": "^0.1.0"
   }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import me.nucleartux.date.ReactDatePackage;
 import cl.json.RNSharePackage;
+import com.burnweb.rnsendintent.RNSendIntentPackage;
 
 public class MainActivity extends ReactActivity {
 
@@ -37,6 +38,6 @@ public class MainActivity extends ReactActivity {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-        new MainReactPackage(), new ReactDatePackage(this), new RNSharePackage());
+        new MainReactPackage(), new ReactDatePackage(this), new RNSharePackage(), new RNSendIntentPackage());
     }
 }

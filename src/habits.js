@@ -13,6 +13,7 @@ var Subscribable = require('Subscribable');
 var moment = require('moment');
 var RNCalendarReminders = require('react-native-calendar-reminders');
 import Popup from 'react-native-popup';
+var SendIntentAndroid = require('react-native-send-intent');
 
 var Button = require('./components/button');
 var HabitForm = require('./components/habit-form');
@@ -162,19 +163,48 @@ module.exports = React.createClass({
       //     content: <AndroidDate events={this.props.events} />,
       // });
       //return <AndroidDate events={this.props.events} />
+
+      var habits = this.props.habits;
+
+      console.log('habits[habitIdx]:', habits[habitIdx].reminder);
+
+      if (habits[habitIdx].reminder === undefined) {
+        // Create new Calendar event.
         NativeModules.DateAndroid.showTimepicker(function() {}, (hour, minute) => {
           console.log(hour + ":" + minute);
           // this.props.events.emit('date-changed', hour + ":" + minute);
 
-          var habits = this.props.habits;
+          // Reound the minute to the nearest 10 to make things look cleaner on the Calendar.
+          minute = Math.round(minute / 10) * 10;
+
           // var momentDate = moment(this.state.chosenDate);
 
           habits[habitIdx].reminder = hour + ":" + minute;
+          store.save('habits', this.props.habits);
+
           this.setState({habits: habits}, () => {
-            store.save('habits', this.props.habits);
             this.props.events.emit('new-habit', this.props.habits);
+
+            // Get the endDate using Moment based on Moment object for the startDate and adding 30 minutes.
+            var startDate = moment().format('YYYY-MM-DD') + ' ' + habits[habitIdx].reminder;
+            var startMoment = moment(startDate);
+            var endMoment = startMoment.add(30, 'm');
+            var endDate = endMoment.format('YYYY-MM-DD hh:mm');
+
+            // Create the Calendar Intent.
+            SendIntentAndroid.sendAddCalendarEvent({
+              title: habits[habitIdx].name,
+              description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
+              startDate: startDate,
+              endDate: endDate,
+              recurrence: 'daily'
+            });
           });
         });
+      } else {
+        // Open Calendar for editing reminder event.
+        SendIntentAndroid.sendOpenCalendar();
+      }
     }
   },
 
