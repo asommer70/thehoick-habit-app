@@ -168,7 +168,7 @@ module.exports = React.createClass({
 
       console.log('habits[habitIdx]:', habits[habitIdx].reminder);
 
-      if (habits[habitIdx].reminder === undefined) {
+      if (habits[habitIdx].reminder === undefined || habits[habitIdx].reminder === null) {
         // Create new Calendar event.
         NativeModules.DateAndroid.showTimepicker(function() {}, (hour, minute) => {
           console.log(hour + ":" + minute);
@@ -197,7 +197,7 @@ module.exports = React.createClass({
               description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
               startDate: startDate,
               endDate: endDate,
-              recurrence: 'daily'
+              recurrence: 'weekly'
             });
           });
         });
@@ -215,21 +215,31 @@ module.exports = React.createClass({
 
   removeReminder: function(visible) {
     var habits = this.props.habits;
-    habits[this.state.habitReminderIdx].reminder = null;
 
-    this.setState({habits: habits, modalVisible: visible}, () => {
-      store.save('habits', this.props.habits);
-      this.props.events.emit('new-habit', this.props.habits);
-    });
+    if (React.Platform.OS == 'ios') {
+      habits[this.state.habitReminderIdx].reminder = null;
 
-    // Remove the Reminder from iOS.
-    RNCalendarReminders.fetchAllReminders(reminders => {
-      for (var i = 0; i < reminders.length; i++) {
-        if (reminders[i].title == this.props.habits[this.state.habitReminderIdx].name) {
-          RNCalendarReminders.removeReminder(reminders[i].id);
+      this.setState({habits: habits, modalVisible: visible}, () => {
+        store.save('habits', this.props.habits);
+        this.props.events.emit('new-habit', this.props.habits);
+      });
+
+      // Remove the Reminder from iOS.
+      RNCalendarReminders.fetchAllReminders(reminders => {
+        for (var i = 0; i < reminders.length; i++) {
+          if (reminders[i].title == this.props.habits[this.state.habitReminderIdx].name) {
+            RNCalendarReminders.removeReminder(reminders[i].id);
+          }
         }
-      }
-    });
+      });
+    } else {
+      habits[visible].reminder = null;
+
+      this.setState({habits: habits}, () => {
+        store.save('habits', this.props.habits);
+        this.props.events.emit('new-habit', this.props.habits);
+      });
+    }
   },
 
   // onPressHandle: function() {
@@ -245,8 +255,12 @@ module.exports = React.createClass({
             <TouchableHighlight style={styles.habitButton} onPress={() => this.habitSelected(index)}>
               <Text style={styles.habitText}>{habit.name ? habit.name : ''}</Text>
             </TouchableHighlight>
+
             <LinkCount habit={habit} linkCountStyle={styles.linkCountText} events={this.props.events}/>
-            <Text style={styles.linkCountText}>Reminder: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
+
+            <TouchableHighlight style={styles.habitButton} onPress={() => this.removeReminder(index)}>
+              <Text style={styles.linkCountText}>Reminder: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
+            </TouchableHighlight>
           </View>
 
           <View style={styles.habitButtons}>
