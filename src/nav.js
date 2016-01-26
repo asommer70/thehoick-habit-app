@@ -47,7 +47,7 @@ module.exports = React.createClass({
         style={styles.container}
         initialRoute={{name: 'main'}}
         renderScene={this.renderScene}
-        configureScene={() => { return Navigator.SceneConfigs.FloatFromRight; }}
+        configureScene={() => { return Navigator.SceneConfigs.FadeAndroid; }}
         />
     );
   }

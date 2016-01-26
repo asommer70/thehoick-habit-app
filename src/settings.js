@@ -4,7 +4,8 @@ var {
   View,
   ScrollView,
   StyleSheet,
-  TextInput
+  TextInput,
+  BackAndroid
 } = React;
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
@@ -36,6 +37,14 @@ module.exports = React.createClass({
       }
       this.setState({settings: data});
     })
+
+    BackAndroid.addEventListener('hardwareBackPress', () => {
+      if (this.props.navigator.getCurrentRoutes().length > 0) {
+       this.goBack();
+       return true;
+      }
+      return false;
+    });
   },
 
   getInitialState: function() {
