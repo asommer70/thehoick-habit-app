@@ -14,13 +14,15 @@ var Subscribable = require('Subscribable');
 var moment = require('moment');
 var RNCalendarReminders = require('react-native-calendar-reminders');
 import Popup from 'react-native-popup';
-var SendIntentAndroid = require('react-native-send-intent');
+
+if (React.Platform.OS != 'ios') {
+  var SendIntentAndroid = require('react-native-send-intent');
+}
 
 var Button = require('./components/button');
 var HabitForm = require('./components/habit-form');
 var LinkCount = require('./components/link-count');
 var IOSDate = require('./components/datepicker-ios');
-var AndroidDate = require('./components/datepicker-android');
 
 module.exports = React.createClass({
   mixins: [Subscribable.Mixin],
@@ -271,9 +273,9 @@ module.exports = React.createClass({
           </View>
 
           <View style={styles.habitButtons}>
-            <Button text={'Set Reminder'} onPress={() => this.openModal(index)} textType={styles.restartText} buttonType={styles.restartButton} />
-            <Button text={'Restart Chain'} onPress={() => this.restartHabit(index)} textType={styles.restartText} buttonType={styles.restartButton} />
-            <Button text={'Delete'} onPress={() => this.deleteHabit(index)} textType={styles.deleteText} buttonType={styles.deleteButton} />
+            <Button imageStyle={styles.iconImage} imageSrc={require('./img/alarm-clock-icon.png')} onPress={() => this.openModal(index)} buttonType={styles.restartButton} />
+            <Button imageStyle={styles.iconImage} imageSrc={require('./img/reload-icon.png')} onPress={() => this.restartHabit(index)} buttonType={styles.restartButton} />
+            <Button imageStyle={styles.iconImage} imageSrc={require('./img/trash-icon.png')} onPress={() => this.deleteHabit(index)} buttonType={styles.deleteButton} />
           </View>
         </View>
       )
@@ -290,10 +292,10 @@ module.exports = React.createClass({
   render: function() {
     return (
       <View style={styles.container}>
-        <Button text={'Back'} onPress={this.goBack} textType={styles.navText} buttonType={styles.navButton} />
+        <Button imageSrc={require('./img/arrow-left-icon.png')} onPress={this.goBack} imageStyle={styles.iconImage} buttonType={styles.navButton} />
 
         <View style={styles.wrapper}>
-          <Button text={'Add Habit'} onPress={this.editHabit} textType={styles.navText} buttonType={styles.navButton} />
+          <Button imageStyle={styles.iconImage} imageSrc={require('./img/plus-icon.png')} onPress={this.editHabit} textType={styles.navText} buttonType={styles.navButton} />
           <HabitForm habits={this.props.habits} events={this.props.events}/>
 
           <Text style={styles.heading}>Habits</Text>
@@ -348,6 +350,17 @@ var styles = StyleSheet.create({
     alignSelf: 'flex-start'
   },
 
+  backButton: {
+    borderColor: '#DFD9B9',
+    borderRadius: 0,
+    flexDirection: 'row'
+  },
+
+  iconImage: {
+    padding: 2,
+    margin: 5
+  },
+
   heading: {
     color: '#DFD9B9',
     fontSize: 30
@@ -373,7 +386,10 @@ var styles = StyleSheet.create({
   },
 
   habitInfo: {
-    alignSelf: 'flex-start'
+    paddingLeft: 5,
+    paddingRight: 20,
+    alignSelf: 'flex-start',
+    width: 140,
   },
 
   habitText: {
@@ -381,7 +397,7 @@ var styles = StyleSheet.create({
     fontSize: 20,
     borderColor: '#DFD9B9',
     paddingLeft: 10,
-    width: 120
+    width: 140
   },
 
   linkCountText: {
@@ -395,12 +411,16 @@ var styles = StyleSheet.create({
   },
 
   habitButtons: {
-    marginLeft: 45
+    flexDirection: 'row',
+    marginRight: 15,
   },
 
   deleteButton: {
     borderColor: '#CE4B41',
+    borderRadius: 0,
+    marginRight: 1,
     marginTop: 3,
+    marginBottom: 3
   },
 
   deleteText: {

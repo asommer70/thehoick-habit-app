@@ -85,7 +85,8 @@ module.exports = React.createClass({
       <View style={styles.container}>
         <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
 
-        <Button text={'Back'} onPress={this.goBack} textType={styles.navText} buttonType={styles.navButton} />
+        <Button imageSrc={require('./img/arrow-left-icon.png')} onPress={this.goBack} imageStyle={styles.backImage} buttonType={styles.navButton} />
+
 
         <View style={styles.wrapper}>
 
@@ -140,6 +141,17 @@ var styles = StyleSheet.create({
     borderColor: '#DFD9B9',
     borderRadius: 0,
     alignSelf: 'flex-start'
+  },
+
+  backButton: {
+    borderColor: '#DFD9B9',
+    borderRadius: 0,
+    flexDirection: 'row'
+  },
+
+  backImage: {
+    padding: 10,
+    margin: 5
   },
 
   heading: {

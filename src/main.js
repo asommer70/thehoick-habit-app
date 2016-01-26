@@ -102,9 +102,9 @@ module.exports = React.createClass({
         </ScrollView>
 
         <View style={styles.buttonRow}>
-          <Button text={'Settings'} onPress={this.openSettings} textType={styles.navText} buttonType={styles.shareButton} />
+          <Button text={'Settings'} imageSrc={require('./img/gear-icon.png')} onPress={this.openSettings} textType={styles.navText} buttonType={styles.shareButton} />
           <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
-          <Button text={'Habits'} onPress={this.openHabits} textType={styles.navText} buttonType={styles.shareButton} />
+          <Button text={'Habits'} imageSrc={require('./img/stack-icon.png')} onPress={this.openHabits} textType={styles.navText} buttonType={styles.shareButton} />
         </View>
       </View>
     )
@@ -158,6 +158,6 @@ var styles = StyleSheet.create({
   navText: {
     textAlign: 'center',
     color: '#DFD9B9',
-    fontSize: 18
+    fontSize: 12
   },
 });

@@ -11,7 +11,7 @@ module.exports = React.createClass({
   render: function() {
     var image;
     if (this.props.imageSrc) {
-      image = <Image source={this.props.imageSrc} style={styles.shareIcon} />;
+      image = <Image source={this.props.imageSrc} style={[styles.shareIcon, this.props.imageStyle]} />;
     } else {
       image = <View></View>;
     }
@@ -20,7 +20,7 @@ module.exports = React.createClass({
       <TouchableHighlight style={[styles.button, this.props.buttonType]} underlayColor={'gray'} onPress={this.props.onPress}>
         <View>
           {image}
-          <Text style={[styles.buttonText, this.props.textType]}>{this.props.text}</Text>
+          {this.props.text ? <Text style={[styles.buttonText, this.props.textType]}>{this.props.text}</Text> : <View/>}
         </View>
       </TouchableHighlight>
     )
