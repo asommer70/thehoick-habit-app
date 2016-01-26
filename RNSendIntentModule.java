@@ -172,14 +172,11 @@ public class RNSendIntentModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void sendOpenCalendar() {
-      // ComponentName cn = new ComponentName("com.google.android.calendar", "com.android.calendar.LaunchActivity");
       ComponentName cn = new ComponentName("com.android.calendar", "com.android.calendar.LaunchActivity");
-
 
       Intent sendIntent = new Intent()
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-          .setComponent(cn);
-          // .setType("vnd.android.cursor.item/event");
+          .setType("vnd.android.cursor.item/event");
 
       if (sendIntent.resolveActivity(this.reactContext.getPackageManager()) != null) {
           this.reactContext.startActivity(sendIntent);

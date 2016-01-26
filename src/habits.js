@@ -197,7 +197,7 @@ module.exports = React.createClass({
               description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
               startDate: startDate,
               endDate: endDate,
-              recurrence: 'weekly'
+              recurrence: 'daily'
             });
           });
         });
