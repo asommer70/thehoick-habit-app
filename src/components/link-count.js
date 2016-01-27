@@ -24,7 +24,6 @@ module.exports = React.createClass({
   render: function() {
     var checkedDays;
     var checks;
-    console.log('this.props.habit:', this.props.habit);
     if (this.props.habit && this.props.habit.days.length >= 1) {
 
       // Need an array of checked days starting with today going back to the first unchecked day.

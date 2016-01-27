@@ -23,7 +23,6 @@ module.exports = React.createClass({
     });
 
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      console.log('main new-habit event... habits:', habits);
       if (habits.length >= 1) {
         this.setState({habit: habits[habits.length - 1]});
       } else {
@@ -38,7 +37,7 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function() {
-    console.log('React:', React.Platform.OS);
+    // console.log('React:', React.Platform.OS);
     store.get('settings').then((data) => {
       if (data === null) {
         data = {};

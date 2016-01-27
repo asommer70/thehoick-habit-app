@@ -12,12 +12,14 @@ var {
 var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
 var moment = require('moment');
-var RNCalendarReminders = require('react-native-calendar-reminders');
-import Popup from 'react-native-popup';
 
 if (React.Platform.OS != 'ios') {
   var SendIntentAndroid = require('react-native-send-intent');
+} else {
+  var RNCalendarReminders = require('react-native-calendar-reminders');
 }
+
+import Popup from 'react-native-popup';
 
 var Button = require('./components/button');
 var HabitForm = require('./components/habit-form');
@@ -33,59 +35,7 @@ module.exports = React.createClass({
     });
 
     this.addListenerOn(this.props.events, 'date-picked', () => {
-      // var date = this.state.chosenDate;
-      var habits = this.props.habits;
-      var momentDate = moment(this.state.chosenDate);
 
-      habits[this.state.habitReminderIdx].reminder = momentDate.format('hh:mm');
-
-      this.setState({habits: habits}, () => {
-        store.save('habits', this.props.habits);
-        this.props.events.emit('new-habit', this.props.habits);
-      });
-
-      // Set the habit from the Date Picker.
-      RNCalendarReminders.authorizeEventStore((error, auth) => {
-        console.log('authorizing EventStore...');
-      });
-
-      var habit = this.props.habits[this.props.habits.length - 1];
-
-      // Search for the Reminder.
-      RNCalendarReminders.fetchAllReminders(reminders => {
-        // Find the Reminder ID.
-        var reminderId;
-        for (var i = 0; i < reminders.length; i++) {
-          if (reminders[i].title == habit.name) {
-            reminderId = reminders[i].id;
-            break;
-          }
-        }
-
-        // Update the Reminder, or create a new one.
-        if (reminderId !== undefined) {
-          RNCalendarReminders.saveReminder(habit.name, {
-            id: reminders[i].id,
-            location: '',
-            notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
-            startDate: this.state.chosenDate,
-            alarms: [{
-              date: -1 // or absolute date
-            }],
-            recurrence: 'daily'
-          });
-        } else {
-          RNCalendarReminders.saveReminder(habit.name, {
-            location: '',
-            notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
-            startDate: this.state.chosenDate,
-            alarms: [{
-              date: -1 // or absolute date
-            }],
-            recurrence: 'daily'
-          });
-        }
-      });
     });
   },
 
@@ -162,64 +112,114 @@ module.exports = React.createClass({
   },
 
   openModal: function(habitIdx) {
-    console.log('habits openModal... habitIdx:', habitIdx);
     if (React.Platform.OS == 'ios') {
       this.setState({modalVisible: true, habitReminderIdx: habitIdx})
     } else {
-      // this.popup.alert(1, 'beans...');
-      // this.popup.tip({
-      //     title: 'Choose Reminder Time',
-      //     content: <AndroidDate events={this.props.events} />,
-      // });
-      //return <AndroidDate events={this.props.events} />
-
-      var habits = this.props.habits;
-
-      console.log('habits[habitIdx]:', habits[habitIdx].reminder);
-
-      if (habits[habitIdx].reminder === undefined || habits[habitIdx].reminder === null) {
-        // Create new Calendar event.
-        NativeModules.DateAndroid.showTimepicker(function() {}, (hour, minute) => {
-          console.log(hour + ":" + minute);
-          // this.props.events.emit('date-changed', hour + ":" + minute);
-
-          // Reound the minute to the nearest 10 to make things look cleaner on the Calendar.
-          minute = Math.round(minute / 10) * 10;
-
-          // var momentDate = moment(this.state.chosenDate);
-
-          habits[habitIdx].reminder = hour + ":" + minute;
-          store.save('habits', this.props.habits);
-
-          this.setState({habits: habits}, () => {
-            this.props.events.emit('new-habit', this.props.habits);
-
-            // Get the endDate using Moment based on Moment object for the startDate and adding 30 minutes.
-            var startDate = moment().format('YYYY-MM-DD') + ' ' + habits[habitIdx].reminder;
-            var startMoment = moment(startDate);
-            var endMoment = startMoment.add(30, 'm');
-            var endDate = endMoment.format('YYYY-MM-DD hh:mm');
-
-            // Create the Calendar Intent.
-            SendIntentAndroid.sendAddCalendarEvent({
-              title: habits[habitIdx].name,
-              description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
-              startDate: startDate,
-              endDate: endDate,
-              recurrence: 'daily'
-            });
-          });
-        });
-      } else {
-        // Open Calendar for editing reminder event.
-        SendIntentAndroid.sendOpenCalendar();
-      }
+      this.addAndroidReminder(habitIdx);
     }
   },
 
   closeModal: function(visible) {
     this.setState({modalVisible: visible});
-    this.props.events.emit('date-picked');
+    // this.props.events.emit('date-picked');
+    this.addiOSReminder();
+  },
+
+  addiOSReminder: function() {
+    // var date = this.state.chosenDate;
+    var habits = this.props.habits;
+    var momentDate = moment(this.state.chosenDate);
+
+    habits[this.state.habitReminderIdx].reminder = momentDate.format('hh:mm');
+
+    this.setState({habits: habits}, () => {
+      store.save('habits', this.props.habits);
+      this.props.events.emit('new-habit', this.props.habits);
+    });
+
+    var habit = this.props.habits[this.state.habitReminderIdx];
+
+    // Set the habit from the Date Picker.
+    RNCalendarReminders.authorizeEventStore((error, auth) => {
+      console.log('authorizing EventStore...');
+    });
+
+    // Search for the Reminder.
+    RNCalendarReminders.fetchAllReminders(reminders => {
+      // Find the Reminder ID.
+      var reminderId;
+      for (var i = 0; i < reminders.length; i++) {
+        if (reminders[i].title == habit.name) {
+          reminderId = reminders[i].id;
+          break;
+        }
+      }
+
+      // Update the Reminder, or create a new one.
+      reminderObj = {
+        location: '',
+        notes: 'Reminder from The Hoick Habit App for Habit: ' + habit.name,
+        startDate: this.state.chosenDate,
+        alarms: [{
+          date: -1 // or absolute date
+        }],
+        recurrence: 'daily'
+      };
+
+      if (reminderId !== undefined) {
+        reminderObj.id = reminders[i].id;
+      }
+
+      RNCalendarReminders.saveReminder(habit.name, reminderObj);
+    });
+  },
+
+  addAndroidReminder: function(habitIdx) {
+    // this.popup.alert(1, 'beans...');
+    // this.popup.tip({
+    //     title: 'Choose Reminder Time',
+    //     content: <AndroidDate events={this.props.events} />,
+    // });
+    //return <AndroidDate events={this.props.events} />
+
+    var habits = this.props.habits;
+
+    if (habits[habitIdx].reminder === undefined || habits[habitIdx].reminder === null) {
+      // Create new Calendar event.
+      NativeModules.DateAndroid.showTimepicker(function() {}, (hour, minute) => {
+        // this.props.events.emit('date-changed', hour + ":" + minute);
+
+        // Reound the minute to the nearest 10 to make things look cleaner on the Calendar.
+        minute = Math.round(minute / 10) * 10;
+
+        // var momentDate = moment(this.state.chosenDate);
+
+        habits[habitIdx].reminder = hour + ":" + minute;
+        store.save('habits', this.props.habits);
+
+        this.setState({habits: habits}, () => {
+          this.props.events.emit('new-habit', this.props.habits);
+
+          // Get the endDate using Moment based on Moment object for the startDate and adding 30 minutes.
+          var startDate = moment().format('YYYY-MM-DD') + ' ' + habits[habitIdx].reminder;
+          var startMoment = moment(startDate);
+          var endMoment = startMoment.add(30, 'm');
+          var endDate = endMoment.format('YYYY-MM-DD hh:mm');
+
+          // Create the Calendar Intent.
+          SendIntentAndroid.sendAddCalendarEvent({
+            title: habits[habitIdx].name,
+            description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
+            startDate: startDate,
+            endDate: endDate,
+            recurrence: 'daily'
+          });
+        });
+      });
+    } else {
+      // Open Calendar for editing reminder event.
+      SendIntentAndroid.sendOpenCalendar();
+    }
   },
 
   removeReminder: function(visible) {
