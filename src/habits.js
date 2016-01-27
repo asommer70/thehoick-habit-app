@@ -226,9 +226,18 @@ module.exports = React.createClass({
     var habits = this.props.habits;
 
     if (React.Platform.OS == 'ios') {
-      habits[this.state.habitReminderIdx].reminder = null;
+      console.log('visible:', visible);
 
-      this.setState({habits: habits, modalVisible: visible}, () => {
+      var habit;
+      if (visible !== false) {
+        habits[visible].reminder = null;
+        habit = habits[visible];
+      } else {
+        habits[this.state.habitReminderIdx].reminder = null;
+        habit = habits[this.state.habitReminderIdx];
+      }
+
+      this.setState({habits: habits, modalVisible: false}, () => {
         store.save('habits', this.props.habits);
         this.props.events.emit('new-habit', this.props.habits);
       });
@@ -236,7 +245,7 @@ module.exports = React.createClass({
       // Remove the Reminder from iOS.
       RNCalendarReminders.fetchAllReminders(reminders => {
         for (var i = 0; i < reminders.length; i++) {
-          if (reminders[i].title == this.props.habits[this.state.habitReminderIdx].name) {
+          if (reminders[i].title == habit.name) {
             RNCalendarReminders.removeReminder(reminders[i].id);
           }
         }
@@ -261,14 +270,14 @@ module.exports = React.createClass({
       return (
         <View style={styles.habits} key={index}>
           <View style={styles.habitInfo}>
-            <TouchableHighlight style={styles.habitButton} onPress={() => this.habitSelected(index)}>
+            <TouchableHighlight underlayColor={'gray'} style={styles.habitButton} onPress={() => this.habitSelected(index)}>
               <Text style={styles.habitText}>{habit.name ? habit.name : ''}</Text>
             </TouchableHighlight>
 
             <LinkCount habit={habit} linkCountStyle={styles.linkCountText} events={this.props.events}/>
 
-            <TouchableHighlight style={styles.habitButton} onPress={() => this.removeReminder(index)}>
-              <Text style={styles.linkCountText}>Reminder: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
+            <TouchableHighlight underlayColor={'gray'} style={styles.habitButton} onPress={() => this.removeReminder(index)}>
+              <Text style={styles.reminderText}>Reminder: {habit.reminder ? habit.reminder : 'No Reminder'}</Text>
             </TouchableHighlight>
           </View>
 
@@ -404,6 +413,13 @@ var styles = StyleSheet.create({
     color: '#DFD9B9',
     fontSize: 12,
     paddingLeft: 10
+  },
+
+  reminderText: {
+    color: '#DFD9B9',
+    fontSize: 12,
+    paddingLeft: 10,
+    textDecorationLine: 'underline'
   },
 
   row: {
