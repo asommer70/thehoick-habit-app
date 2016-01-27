@@ -18,7 +18,7 @@ module.exports = React.createClass({
 
     return (
       <TouchableHighlight style={[styles.button, this.props.buttonType]} underlayColor={'gray'} onPress={this.props.onPress}>
-        <View>
+        <View style={this.props.imagePos}>
           {image}
           {this.props.text ? <Text style={[styles.buttonText, this.props.textType]}>{this.props.text}</Text> : <View/>}
         </View>
