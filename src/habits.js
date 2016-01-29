@@ -34,8 +34,8 @@ module.exports = React.createClass({
       this.setState({chosenDate: date})
     });
 
-    this.addListenerOn(this.props.events, 'date-picked', () => {
-
+    this.addListenerOn(this.props.events, 'got-habits', (habits) => {
+      this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
   },
 
@@ -85,7 +85,7 @@ module.exports = React.createClass({
 
     // Save the new Habits.
     this.setState({habits: habits}, () => {
-      this.props.events.emit('new-habit', this.props.habits);
+      // this.props.events.emit('new-habit', this.props.habits);
       store.save('habits', this.props.habits);
     })
   },
@@ -230,8 +230,6 @@ module.exports = React.createClass({
     var habits = this.props.habits;
 
     if (React.Platform.OS == 'ios') {
-      console.log('visible:', visible);
-
       var habit;
       if (visible !== false) {
         habits[visible].reminder = null;

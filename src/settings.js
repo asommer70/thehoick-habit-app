@@ -48,6 +48,25 @@ module.exports = React.createClass({
 
   saveSettings: function() {
     store.save('settings', this.state.settings);
+
+    if (this.props.habits.length === 0) {
+      // Empty habits get data from server.
+      fetch(this.state.settings.url + '/' + this.state.settings.username)
+        .then((response) => response.text())
+        .then((responseText) => {
+
+          var habits = JSON.parse(responseText).habits;
+          store.save('habits', habits);
+
+          // Tell the Habit component on Main that we have some Habits, and all the other components.
+          this.props.events.emit('got-habits', habits);
+          this.props.events.emit('got-server-habits', habits);
+        })
+        .catch((error) => {
+          console.warn(error);
+        });
+    }
+
     this.popup.alert('Settings saved...');
   },
 

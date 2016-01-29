@@ -22,16 +22,25 @@ module.exports = React.createClass({
 
   componentWillMount: function() {
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
-      var habit = habits[habits.length - 1];
-      var checked = this.checked(habit);
-
-      this.setState({habits: habits, habit: habit, checked: checked})
+      this.setHabits(habits);
     });
 
     this.addListenerOn(this.props.events, 'chain-restarted', (data) => {
       if (this.state.habit == data.habits[data.habitIdx]) {
         this.setState({checked: false});
       }
+    });
+
+    this.addListenerOn(this.props.events, 'got-server-habits', (habits) => {
+      this.setHabits(habits);
+    });
+  },
+
+  setHabits: function(habits) {
+    var habit = habits[habits.length - 1];
+    var checked = this.checked(habit);
+    this.setState({habit: habit, habits: habits, checked: checked, dataSource: this.state.dataSource.cloneWithRows(habits)}, function() {
+      this.props.events.emit('got-habits', this.state.habits);
     });
   },
 
@@ -50,17 +59,7 @@ module.exports = React.createClass({
   componentDidMount: function() {
     // Get the habits from AsyncStorage and set the current habit to the last one.
     store.get('habits').then((data) => {
-      var habit;
-      var checked;
-
-      habit = data[data.length - 1];
-      checked = this.checked(habit);
-
-      if (this.isMounted()) {
-        this.setState({habit: habit, habits: data, checked: checked, dataSource: this.state.dataSource.cloneWithRows(data)}, function() {
-          this.props.events.emit('got-habits', this.state.habits);
-        });
-      }
+      this.setHabits(data);
     });
   },
 

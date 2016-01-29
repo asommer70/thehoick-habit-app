@@ -21,7 +21,7 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
-
+    
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
       if (habits.length >= 1) {
         this.setState({habit: habits[habits.length - 1]});
@@ -34,10 +34,13 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'day-added', () => {
       this.sendData();
     });
+
+    this.addListenerOn(this.props.events, 'chain-restarted', () => {
+      this.sendData();
+    });
   },
 
   componentDidMount: function() {
-    // console.log('React:', React.Platform.OS);
     store.get('settings').then((data) => {
       if (data === null) {
         data = {};
@@ -54,10 +57,12 @@ module.exports = React.createClass({
   },
 
   sendData: function() {
+    console.log('sendData called....');
     if (this.state.settings.url !== undefined &&
         this.state.settings.url != '' &&
         this.state.settings.username !== undefined &&
         this.state.settings.username != '') {
+      console.log('Setting up fetch method...');
       fetch(this.state.settings.url, {
         method: 'POST',
         headers: {
@@ -66,6 +71,13 @@ module.exports = React.createClass({
         },
         body: JSON.stringify({username: this.state.settings.username, habits: this.state.habits})
       })
+        .then((response) => response.text())
+        .then((responseText) => {
+          console.log(responseText);
+        })
+        .catch((error) => {
+          console.warn(error);
+        });
     }
   },
 
