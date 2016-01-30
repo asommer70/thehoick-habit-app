@@ -21,7 +21,7 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
-    
+
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
       if (habits.length >= 1) {
         this.setState({habit: habits[habits.length - 1]});
@@ -38,6 +38,10 @@ module.exports = React.createClass({
     this.addListenerOn(this.props.events, 'chain-restarted', () => {
       this.sendData();
     });
+
+    this.addListenerOn(this.props.events, 'settings-saved', (settings) => {
+      this.setState({settings: settings});
+    });
   },
 
   componentDidMount: function() {
@@ -46,8 +50,7 @@ module.exports = React.createClass({
         data = {};
       }
       this.setState({settings: data});
-    })
-  },
+    })  },
 
   getInitialState: function() {
     return {
@@ -57,12 +60,10 @@ module.exports = React.createClass({
   },
 
   sendData: function() {
-    console.log('sendData called....');
     if (this.state.settings.url !== undefined &&
         this.state.settings.url != '' &&
         this.state.settings.username !== undefined &&
         this.state.settings.username != '') {
-      console.log('Setting up fetch method...');
       fetch(this.state.settings.url, {
         method: 'POST',
         headers: {
@@ -73,10 +74,10 @@ module.exports = React.createClass({
       })
         .then((response) => response.text())
         .then((responseText) => {
-          console.log(responseText);
+          // console.log(responseText);
         })
         .catch((error) => {
-          console.warn(error);
+          // console.log('sendData fetch error:', error);
         });
     }
   },
@@ -87,7 +88,7 @@ module.exports = React.createClass({
       share_URL: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
       title: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
     },function(e) {
-      console.log(e);
+      // console.log(e);
     });
   },
 

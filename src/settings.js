@@ -49,24 +49,26 @@ module.exports = React.createClass({
   saveSettings: function() {
     store.save('settings', this.state.settings);
 
-    if (this.props.habits.length === 0) {
-      // Empty habits get data from server.
-      fetch(this.state.settings.url + '/' + this.state.settings.username)
-        .then((response) => response.text())
-        .then((responseText) => {
+    // Empty habits get data from server.
+    fetch(this.state.settings.url + '/' + this.state.settings.username)
+      .then((response) => response.text())
+      .then((responseText) => {
 
-          var habits = JSON.parse(responseText).habits;
+        var habits = JSON.parse(responseText).habits;
+          if (this.props.habits.length === 0) {
           store.save('habits', habits);
+        }
 
-          // Tell the Habit component on Main that we have some Habits, and all the other components.
-          this.props.events.emit('got-habits', habits);
-          this.props.events.emit('got-server-habits', habits);
-        })
-        .catch((error) => {
-          console.warn(error);
-        });
-    }
 
+        // Tell the Habit component on Main that we have some Habits, and all the other components.
+        this.props.events.emit('got-server-habits', habits);
+        this.props.events.emit('got-habits', habits);
+      })
+      .catch((error) => {
+        this.popup.alert('Problem with the URL you entered could not get data.');
+      });
+
+    this.props.events.emit('settings-saved', this.state.settings);
     this.popup.alert('Settings saved...');
   },
 
