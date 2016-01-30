@@ -85,7 +85,7 @@ module.exports = React.createClass({
 
     // Save the new Habits.
     this.setState({habits: habits}, () => {
-      // this.props.events.emit('new-habit', this.props.habits);
+      this.props.events.emit('new-habit', this.props.habits);
       store.save('habits', this.props.habits);
     })
   },

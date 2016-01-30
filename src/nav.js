@@ -39,13 +39,21 @@ module.exports = React.createClass({
     return <Component route={route} navigator={navigator} events={this.eventEmitter} habits={this.state.habits} />;
   },
 
+  getSceneConfig: function() {
+    if (React.Platform.OS == 'ios') {
+      return Navigator.SceneConfigs.FloatFromBottom;
+    } else {
+      return Navigator.SceneConfigs.FadeAndroid;
+    }
+  },
+
   render: function() {
     return (
       <Navigator
         style={styles.container}
         initialRoute={{name: 'main'}}
         renderScene={this.renderScene}
-        configureScene={() => { return Navigator.SceneConfigs.FadeAndroid; }}
+        configureScene={() => { return this.getSceneConfig(); }}
         />
     );
   }
