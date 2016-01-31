@@ -133,7 +133,7 @@
 		00E356F21AD99517003FC87E /* thehoick.habit_appTests.m.beans */ = {isa = PBXFileReference; lastKnownFileType = text; path = thehoick.habit_appTests.m.beans; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* thehoick.habit_app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = thehoick.habit_app.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Habit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Habit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = thehoick.habit_app/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = thehoick.habit_app/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -340,7 +340,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* thehoick.habit_app.app */,
+				13B07F961A680F5B00A75B9A /* Habit App.app */,
 				00E356EE1AD99517003FC87E /* thehoick.habit_appTests.xctest */,
 			);
 			name = Products;
@@ -382,7 +382,7 @@
 			);
 			name = thehoick.habit_app;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* thehoick.habit_app.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Habit App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -690,7 +690,8 @@
 				INFOPLIST_FILE = thehoick.habit_app/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = thehoick.habit_app;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.thehoick.habit-app";
+				PRODUCT_NAME = "Habit App";
 				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
@@ -710,7 +711,8 @@
 				INFOPLIST_FILE = thehoick.habit_app/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = thehoick.habit_app;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.thehoick.habit-app";
+				PRODUCT_NAME = "Habit App";
 				PROVISIONING_PROFILE = "";
 			};
 			name = Release;

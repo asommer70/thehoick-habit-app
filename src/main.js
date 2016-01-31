@@ -74,7 +74,14 @@ module.exports = React.createClass({
       })
         .then((response) => response.text())
         .then((responseText) => {
-          // console.log(responseText);
+          console.log('sendData responseText:', responseText);
+          var habits = JSON.parse(responseText).habits;
+          // Merge habits somehow...
+
+          // Loop through each habit.
+          // Check for new Days
+          // If incoming last Day is newer than local last Day update the habit.
+
         })
         .catch((error) => {
           // console.log('sendData fetch error:', error);
