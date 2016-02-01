@@ -3,6 +3,7 @@ var {
   View,
   StyleSheet,
   ScrollView,
+  BackAndroid
 } = React;
 var store = require('react-native-simple-store');
 var Share = require('react-native-share');
@@ -50,7 +51,16 @@ module.exports = React.createClass({
         data = {};
       }
       this.setState({settings: data});
-    })  },
+    });
+
+    BackAndroid.addEventListener('hardwareBackPress', () => {
+      if (this.props.navigator.getCurrentRoutes().length == 1) {
+        BackAndroid.exitApp();
+      } else {
+        return true;
+      }
+    });
+  },
 
   getInitialState: function() {
     return {
@@ -74,13 +84,20 @@ module.exports = React.createClass({
       })
         .then((response) => response.text())
         .then((responseText) => {
-          console.log('sendData responseText:', responseText);
-          var habits = JSON.parse(responseText).habits;
-          // Merge habits somehow...
-
-          // Loop through each habit.
-          // Check for new Days
+          // var habits = JSON.parse(responseText).habits;
+          // // Merge habits somehow...
+          //
+          // // Loop through each habit.
+          // for (var i = 0; i < habits.length; i++) {
+          //   // If Habit isn't local add it.
+          //   if (this.state.habits[habit[i]] )
+          //   // Check for new Days
+          //   var lastServerHabitDay = habits[i].days[habits[i].days.length - 1];
+          //   var lastLocalHabitDay = this.state.habits[habits[i].name].days[this.state.habits[habit[i].name].days.length - 1];
+          // }
           // If incoming last Day is newer than local last Day update the habit.
+
+          //Actually think I only need this on the server.
 
         })
         .catch((error) => {
