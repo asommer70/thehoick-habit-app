@@ -55,10 +55,7 @@ module.exports = React.createClass({
       .then((responseText) => {
 
         var habits = JSON.parse(responseText).habits;
-          if (this.props.habits.length === 0) {
-          store.save('habits', habits);
-        }
-
+        store.save('habits', habits);
 
         // Tell the Habit component on Main that we have some Habits, and all the other components.
         this.props.events.emit('got-server-habits', habits);

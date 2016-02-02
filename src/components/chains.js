@@ -13,7 +13,11 @@ module.exports = React.createClass({
 
   componentDidMount: function() {
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-      var habit = habits[habits.length - 1];
+      if (habits.length > 0) {
+        var habit = habits[habits.length - 1];
+      } else {
+        var habit = {name: '', days: []};
+      }
       this.setState({habit: habit, days: habit.days});
     });
 

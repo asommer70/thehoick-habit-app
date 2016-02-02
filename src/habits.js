@@ -310,7 +310,7 @@ module.exports = React.createClass({
 
           <View style={styles.hr}></View>
 
-          <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
+          <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} showsVerticalScrollIndicator={true}>
             {this.habitComponents()}
           </ScrollView>
         </View>
@@ -344,6 +344,10 @@ var styles = StyleSheet.create({
     marginTop: 40,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  mainScroll: {
+    height: 300
   },
 
   navText: {

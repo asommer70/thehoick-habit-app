@@ -29,15 +29,17 @@ module.exports = React.createClass({
       } else {
         this.setState({habit: {name: '', days: [], reminder: ''}});
       }
-      this.sendData();
+      console.log('main new-habit event...');
+
+      this.sendData({flag: 'new-habit'});
     });
 
     this.addListenerOn(this.props.events, 'day-added', () => {
-      this.sendData();
+      this.sendData({flag: 'day-added'});
     });
 
     this.addListenerOn(this.props.events, 'chain-restarted', () => {
-      this.sendData();
+      this.sendData({flag: 'chain-restarted'});
     });
 
     this.addListenerOn(this.props.events, 'settings-saved', (settings) => {
@@ -69,7 +71,8 @@ module.exports = React.createClass({
     }
   },
 
-  sendData: function() {
+  sendData: function(options) {
+    console.log('sendData options:', options);
     if (this.state.settings.url !== undefined &&
         this.state.settings.url != '' &&
         this.state.settings.username !== undefined &&
@@ -80,25 +83,11 @@ module.exports = React.createClass({
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({username: this.state.settings.username, habits: this.state.habits})
+        body: JSON.stringify({username: this.state.settings.username, habits: this.state.habits, options: options})
       })
         .then((response) => response.text())
         .then((responseText) => {
-          // var habits = JSON.parse(responseText).habits;
-          // // Merge habits somehow...
-          //
-          // // Loop through each habit.
-          // for (var i = 0; i < habits.length; i++) {
-          //   // If Habit isn't local add it.
-          //   if (this.state.habits[habit[i]] )
-          //   // Check for new Days
-          //   var lastServerHabitDay = habits[i].days[habits[i].days.length - 1];
-          //   var lastLocalHabitDay = this.state.habits[habits[i].name].days[this.state.habits[habit[i].name].days.length - 1];
-          // }
-          // If incoming last Day is newer than local last Day update the habit.
-
-          //Actually think I only need this on the server.
-
+          //console.log('responseText:', responseText);
         })
         .catch((error) => {
           // console.log('sendData fetch error:', error);
