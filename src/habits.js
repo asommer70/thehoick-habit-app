@@ -4,7 +4,6 @@ var {
   View,
   ScrollView,
   StyleSheet,
-  Modal,
   TouchableHighlight,
   NativeModules,
   BackAndroid
@@ -15,6 +14,7 @@ var moment = require('moment');
 
 if (React.Platform.OS != 'ios') {
   var SendIntentAndroid = require('react-native-send-intent');
+  var { Modal } = React;
 } else {
   var RNCalendarReminders = require('react-native-calendar-reminders');
 }
@@ -298,6 +298,25 @@ module.exports = React.createClass({
   },
 
   render: function() {
+
+    if (React.Platform.os == 'ios') {
+      var modal = (
+        <Modal
+          animated={true}
+          transparent={false}
+          visible={this.state.modalVisible}>
+          <View style={styles.modal}>
+            <View style={[styles.innerContainer]}>
+              {React.Platform.OS == 'ios' ? <IOSDate events={this.props.events} /> : <View/>}
+              <Button text={'Set Time'} onPress={this.closeModal.bind(this, false)} textType={styles.restartText} buttonType={styles.restartButton} />
+              <Button text={'Remove Reminder'} onPress={this.confirm.bind(this, 'Really remove remove reminder?', 'removeReminder', false)} textType={styles.deleteText} buttonType={styles.deleteButton} />
+            </View>
+          </View>
+        </Modal>
+      );
+    } else {
+      var modal = <View/>
+    }
     return (
       <View style={styles.container}>
         <Button imageSrc={require('./img/arrow-left-icon.png')} onPress={this.goBack} imageStyle={styles.iconImage} buttonType={styles.navButton} />
@@ -316,18 +335,7 @@ module.exports = React.createClass({
         </View>
         <Popup ref={(popup) => { this.popup = popup }}/>
 
-        <Modal
-          animated={true}
-          transparent={false}
-          visible={this.state.modalVisible}>
-          <View style={styles.modal}>
-            <View style={[styles.innerContainer]}>
-              {React.Platform.OS == 'ios' ? <IOSDate events={this.props.events} /> : <View/>}
-              <Button text={'Set Time'} onPress={this.closeModal.bind(this, false)} textType={styles.restartText} buttonType={styles.restartButton} />
-              <Button text={'Remove Reminder'} onPress={this.confirm.bind(this, 'Really remove remove reminder?', 'removeReminder', false)} textType={styles.deleteText} buttonType={styles.deleteButton} />
-            </View>
-          </View>
-        </Modal>
+        {modal}
       </View>
     )
   }
@@ -347,7 +355,7 @@ var styles = StyleSheet.create({
   },
 
   mainScroll: {
-    height: 300
+    height: 280
   },
 
   navText: {
@@ -401,7 +409,7 @@ var styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 20,
     alignSelf: 'flex-start',
-    width: 140,
+    width: 145,
   },
 
   habitText: {
