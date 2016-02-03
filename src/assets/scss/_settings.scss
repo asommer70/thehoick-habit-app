@@ -228,11 +228,11 @@ $breadcrumbs-item-slash: true;
 
 $button-padding: 0.85em 1em;
 $button-margin: 0 0 $global-margin 0;
-$button-fill: solid;
-$button-background: $primary-color;
-$button-background-hover: scale-color($button-background, $lightness: -15%);
-$button-color: #fff;
-$button-color-alt: #000;
+$button-fill: 'hollow';
+$button-background: #DFD9B9;
+$button-background-hover: scale-color(#DFD9B9, $lightness: -15%);
+$button-color: #DFD9B9;
+$button-color-alt: #424242;
 $button-radius: $global-radius;
 $button-sizes: (
   tiny: 0.6rem,
@@ -546,4 +546,3 @@ $topbar-padding: 0.5rem;
 $topbar-background: $light-gray;
 $topbar-title-spacing: 1rem;
 $topbar-input-width: 200px;
-

@@ -8,4 +8,28 @@
   p {
     font-size: 24px;
   }
+
+  img {
+    width: 75px;
+  }
+}
+
+.main {
+  // background-color: $primary-one;
+  // color: $neutral-one;
+
+  background-color: $neutral-one;
+  color: $neutral-two;
+  height: 400px;
+}
+//
+// .info {
+//   background-color: $neutral-one;
+// }
+
+
+.footer {
+  background-color: $primary-one;
+  color: $neutral-one;
+  height: 200px;
 }
