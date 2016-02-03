@@ -42,3 +42,13 @@
 
 @include motion-ui-transitions;
 @include motion-ui-animations;
+
+
+$primary-one: #5091AC;
+$primary-two: #FF615E;
+$accent-one: #FF9D21;
+$accent-two: #329F80;
+$neutral-one: #DFD9B9;
+$neutral-two: #424242;
+
+@import 'main';
