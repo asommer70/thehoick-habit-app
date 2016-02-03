@@ -230,7 +230,7 @@ $button-padding: 0.85em 1em;
 $button-margin: 0 0 $global-margin 0;
 $button-fill: 'hollow';
 $button-background: #DFD9B9;
-$button-background-hover: scale-color(#DFD9B9, $lightness: -15%);
+$button-background-hover: scale-color(#DFD9B9, $lightness: 15%);
 $button-color: #DFD9B9;
 $button-color-alt: #424242;
 $button-radius: $global-radius;
