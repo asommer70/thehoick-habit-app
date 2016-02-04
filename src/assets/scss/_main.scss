@@ -1,4 +1,10 @@
 
+body {
+  background-color: $primary-one;
+  color: $neutral-one;
+  font-family: Ubuntu sans-serif;
+}
+
 .header {
   background: url(/assets/img/habit_app_header_bg.jpg) no-repeat center center fixed;
   color: $neutral-one;
@@ -7,6 +13,7 @@
 
   p {
     font-size: 24px;
+    font-family: 'Noto Serif', serif;
   }
 
   img {
@@ -15,24 +22,52 @@
 }
 
 .main {
-  // background-color: $primary-one;
-  // color: $neutral-one;
-
   background-color: $neutral-one;
   color: $neutral-two;
-  height: 400px;
 }
-//
-// .info {
-//   background-color: $neutral-one;
-// }
-
 
 .footer {
   background-color: $primary-one;
   color: $neutral-one;
-  height: 200px;
+  font-size: 14px;
+  padding: 40px 0 100px 0;
 }
+
+a {
+  color: $accent-one;
+  &:hover {
+    color: $neutral-two;
+  }
+}
+
+h1 {
+  font-family: 'Carter One', sans-serif;
+}
+
+h2, h3 {
+  font-family: 'Noto Serif', serif;
+}
+
+p {
+  font-family: Ubuntu, sans-serif;
+}
+
+button {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+hr.screen-border {
+    border: 0;
+    height: 1px;
+    background: $neutral-two;
+    background-image: linear-gradient(to right, $neutral-one, $neutral-two, $neutral-one);
+}
+
+.spacer {
+  height: 50px;
+  background-color: $neutral-one;
+}
+
 
 @mixin button-hollow-style($color: $primary-color) {
   $color-hover: scale-color($color, $lightness: 50%);
@@ -48,4 +83,73 @@
 
 .white-button {
   @include button-hollow-style($neutral-one);
+}
+
+ul.store-list {
+  list-style: none;
+  padding: 50px 0;
+  text-align: center;
+}
+
+ul.social-list {
+  list-style: none;
+  padding: 10px 0;
+
+  li {
+    display: inline-block;
+  }
+}
+
+#downloadList {
+  background-color: $primary-one;
+  color: $neutral-one;
+}
+
+.bullet-point {
+  text-align: center;
+  h3 {
+    margin-top: 10px;
+  }
+}
+
+.screenshot {
+  width: 200px;
+  border: solid 1px $neutral-two;
+  padding: 3px;
+  -webkit-box-shadow: 0 8px 6px -6px black;
+   -moz-box-shadow: 0 8px 6px -6px black;
+        box-shadow: 0 8px 6px -6px black;
+}
+
+
+@media screen and (max-width: 39.9375em) {
+  #getApp {
+    margin-top: 40px;
+  }
+
+  .screenshot {
+    margin: 20px;
+  }
+
+  .info {
+    .row {
+      margin: 40px 0;
+    }
+  }
+}
+
+@media screen and (min-width: 40em) and (max-width: 63.9375em) {
+  #getApp {
+    margin-top: 40px;
+  }
+
+  .screenshot {
+    margin: 20px;
+  }
+
+  .info {
+    .row {
+      margin: 40px 0;
+    }
+  }
 }
