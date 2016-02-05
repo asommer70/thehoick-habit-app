@@ -5,7 +5,8 @@
   "main": "gulpfile.js",
   "scripts": {
     "start": "gulp",
-    "build": "gulp build --production"
+    "build": "gulp build --production",
+    "live": "rm -rf assets; mv dist/index.html .; mv dist/assets ."
   },
   "author": "ZURB <foundation@zurb.com>",
   "license": "MIT",
