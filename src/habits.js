@@ -195,7 +195,7 @@ module.exports = React.createClass({
           var endDate = endMoment.format('YYYY-MM-DD hh:mm');
 
           // Create the Calendar Intent.
-          SendIntentAndroid.sendAddCalendarEvent({
+          SendIntentAndroid.AddCalendarEvent({
             title: habits[habitIdx].name,
             description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
             startDate: startDate,
@@ -206,7 +206,7 @@ module.exports = React.createClass({
       });
     } else {
       // Open Calendar for editing reminder event.
-      SendIntentAndroid.sendOpenCalendar();
+      SendIntentAndroid.openCalendar();
     }
   },
 
