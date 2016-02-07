@@ -1,5 +1,6 @@
 var React = require('react-native');
 var {
+  AppStateIOS,
   StyleSheet,
   Navigator
 } = React;
@@ -26,6 +27,12 @@ module.exports = React.createClass({
       this.setState({habits: habits}, () => {
       });
     });
+
+    AppStateIOS.removeEventListener('change', this._handleAppStateChange);
+  },
+
+  _handleAppStateChange: function(currentAppState) {
+    this.setState({ currentAppState, });
   },
 
   getInitialState: function() {

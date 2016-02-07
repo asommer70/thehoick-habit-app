@@ -20,7 +20,6 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
-		660A1B961C5D6C0E0090D630 /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 660A1B951C5D6C0E0090D630 /* Images-2.xcassets */; };
 		660A1B981C5D6C220090D630 /* Images-3.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 660A1B971C5D6C220090D630 /* Images-3.xcassets */; };
 		66D9133E1C58D36000624175 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D9133D1C58D35B00624175 /* libRNShare.a */; };
 		66D9133F1C58E3DB00624175 /* libRNCalendarReminders.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D913361C58D2FD00624175 /* libRNCalendarReminders.a */; };
@@ -140,7 +139,6 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = thehoick.habit_app/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = thehoick.habit_app/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
-		660A1B951C5D6C0E0090D630 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-2.xcassets"; path = "thehoick.habit_app/Images-2.xcassets"; sourceTree = "<group>"; };
 		660A1B971C5D6C220090D630 /* Images-3.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-3.xcassets"; path = "thehoick.habit_app/Images-3.xcassets"; sourceTree = "<group>"; };
 		66D913311C58D2FD00624175 /* RNCalendarReminders.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCalendarReminders.xcodeproj; path = "../node_modules/react-native-calendar-reminders/RNCalendarReminders.xcodeproj"; sourceTree = "<group>"; };
 		66D913381C58D35B00624175 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/RNShare.xcodeproj"; sourceTree = "<group>"; };
@@ -260,7 +258,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				660A1B951C5D6C0E0090D630 /* Images-2.xcassets */,
 				660A1B971C5D6C220090D630 /* Images-3.xcassets */,
 			);
 			name = thehoick.habit_app;
@@ -571,7 +568,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				660A1B961C5D6C0E0090D630 /* Images-2.xcassets in Resources */,
 				660A1B981C5D6C220090D630 /* Images-3.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
@@ -688,6 +684,7 @@
 					"$(SRCROOT)/../node_modules/react-native/React/**",
 				);
 				INFOPLIST_FILE = thehoick.habit_app/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.thehoick.habit-app";
@@ -709,6 +706,7 @@
 					"$(SRCROOT)/../node_modules/react-native/React/**",
 				);
 				INFOPLIST_FILE = thehoick.habit_app/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.thehoick.habit-app";
