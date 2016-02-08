@@ -7,3 +7,8 @@ A habit building app based on the ["Don't break the chain"](http://lifehacker.co
 
 
 <img src="https://raw.githubusercontent.com/asommer70/thehoick-habit-app/gh-pages/src/assets/img/nexus5x.png" width="200"/>
+
+
+# License
+
+[MIT](https://github.com/asommer70/thehoick-habit-app/blob/master/LICENSE)
