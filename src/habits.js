@@ -14,8 +14,8 @@ var moment = require('moment');
 
 if (React.Platform.OS != 'ios') {
   var SendIntentAndroid = require('react-native-send-intent');
-  var { Modal } = React;
 } else {
+  var { Modal } = React;
   var RNCalendarReminders = require('react-native-calendar-reminders');
 }
 
@@ -112,8 +112,11 @@ module.exports = React.createClass({
   },
 
   openModal: function(habitIdx) {
-    if (React.Platform.OS == 'ios') {
-      this.setState({modalVisible: true, habitReminderIdx: habitIdx})
+    if (React.Platform.OS === 'ios') {
+      console.log('Opening Modal... React.Platform.OS:', React.Platform.OS);
+      this.setState({modalVisible: true, habitReminderIdx: habitIdx}, () => {
+        console.log('this.state:', this.state);
+      });
     } else {
       this.addAndroidReminder(habitIdx);
     }
@@ -299,24 +302,23 @@ module.exports = React.createClass({
 
   render: function() {
 
-    if (React.Platform.os == 'ios') {
-      var modal = (
-        <Modal
-          animated={true}
-          transparent={false}
-          visible={this.state.modalVisible}>
+    var modal;
+    if (React.Platform.OS === 'ios') {
+      modal = <Modal animated={true} transparent={false} visible={this.state.modalVisible}>
           <View style={styles.modal}>
             <View style={[styles.innerContainer]}>
-              {React.Platform.OS == 'ios' ? <IOSDate events={this.props.events} /> : <View/>}
+              <IOSDate events={this.props.events} />
               <Button text={'Set Time'} onPress={this.closeModal.bind(this, false)} textType={styles.restartText} buttonType={styles.restartButton} />
               <Button text={'Remove Reminder'} onPress={this.confirm.bind(this, 'Really remove remove reminder?', 'removeReminder', false)} textType={styles.deleteText} buttonType={styles.deleteButton} />
             </View>
           </View>
-        </Modal>
-      );
+        </Modal>;
     } else {
-      var modal = <View/>
+      modal = <View/>;
     }
+
+    // console.log('modal:', modal);
+
     return (
       <View style={styles.container}>
         <Button imageSrc={require('./img/arrow-left-icon.png')} onPress={this.goBack} imageStyle={styles.iconImage} buttonType={styles.navButton} />
