@@ -12,7 +12,7 @@ var store = require('react-native-simple-store');
 var Subscribable = require('Subscribable');
 var moment = require('moment');
 
-if (React.Platform.OS != 'ios') {
+if (React.Platform.OS !== 'ios') {
   var SendIntentAndroid = require('react-native-send-intent');
 } else {
   var { Modal } = React;
@@ -198,7 +198,7 @@ module.exports = React.createClass({
           var endDate = endMoment.format('YYYY-MM-DD hh:mm');
 
           // Create the Calendar Intent.
-          SendIntentAndroid.AddCalendarEvent({
+          SendIntentAndroid.addCalendarEvent({
             title: habits[habitIdx].name,
             description: 'Reminder from The Hoick Habit App for Habit: ' + habits[habitIdx].name,
             startDate: startDate,

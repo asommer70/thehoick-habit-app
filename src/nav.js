@@ -28,7 +28,9 @@ module.exports = React.createClass({
       });
     });
 
-    AppStateIOS.removeEventListener('change', this._handleAppStateChange);
+    if (React.Platform.OS == 'ios') {
+      AppStateIOS.removeEventListener('change', this._handleAppStateChange);
+    }
   },
 
   _handleAppStateChange: function(currentAppState) {
