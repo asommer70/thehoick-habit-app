@@ -21,7 +21,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		660A1B981C5D6C220090D630 /* Images-3.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 660A1B971C5D6C220090D630 /* Images-3.xcassets */; };
-		66D9133E1C58D36000624175 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D9133D1C58D35B00624175 /* libRNShare.a */; };
 		66D9133F1C58E3DB00624175 /* libRNCalendarReminders.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D913361C58D2FD00624175 /* libRNCalendarReminders.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 /* End PBXBuildFile section */
@@ -90,19 +89,19 @@
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
 		};
+		66441A2A1C8DBADF00C383D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66441A261C8DBADF00C383D0 /* RNShare.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNShare;
+		};
 		66D913351C58D2FD00624175 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 66D913311C58D2FD00624175 /* RNCalendarReminders.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNCalendarReminders;
-		};
-		66D9133C1C58D35B00624175 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 66D913381C58D35B00624175 /* RNShare.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = RNShare;
 		};
 		78C398B81ACF4ADC00677621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -140,8 +139,8 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = thehoick.habit_app/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		660A1B971C5D6C220090D630 /* Images-3.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-3.xcassets"; path = "thehoick.habit_app/Images-3.xcassets"; sourceTree = "<group>"; };
+		66441A261C8DBADF00C383D0 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		66D913311C58D2FD00624175 /* RNCalendarReminders.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCalendarReminders.xcodeproj; path = "../node_modules/react-native-calendar-reminders/RNCalendarReminders.xcodeproj"; sourceTree = "<group>"; };
-		66D913381C58D35B00624175 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -159,7 +158,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				66D9133F1C58E3DB00624175 /* libRNCalendarReminders.a in Frameworks */,
-				66D9133E1C58D36000624175 /* libRNShare.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
@@ -271,18 +269,18 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		66D913321C58D2FD00624175 /* Products */ = {
+		66441A271C8DBADF00C383D0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66D913361C58D2FD00624175 /* libRNCalendarReminders.a */,
+				66441A2B1C8DBADF00C383D0 /* libRNShare.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		66D913391C58D35B00624175 /* Products */ = {
+		66D913321C58D2FD00624175 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66D9133D1C58D35B00624175 /* libRNShare.a */,
+				66D913361C58D2FD00624175 /* libRNCalendarReminders.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -298,7 +296,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				66D913381C58D35B00624175 /* RNShare.xcodeproj */,
+				66441A261C8DBADF00C383D0 /* RNShare.xcodeproj */,
 				66D913311C58D2FD00624175 /* RNCalendarReminders.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -457,8 +455,8 @@
 					ProjectRef = 66D913311C58D2FD00624175 /* RNCalendarReminders.xcodeproj */;
 				},
 				{
-					ProductGroup = 66D913391C58D35B00624175 /* Products */;
-					ProjectRef = 66D913381C58D35B00624175 /* RNShare.xcodeproj */;
+					ProductGroup = 66441A271C8DBADF00C383D0 /* Products */;
+					ProjectRef = 66441A261C8DBADF00C383D0 /* RNShare.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -526,18 +524,18 @@
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		66441A2B1C8DBADF00C383D0 /* libRNShare.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNShare.a;
+			remoteRef = 66441A2A1C8DBADF00C383D0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		66D913361C58D2FD00624175 /* libRNCalendarReminders.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNCalendarReminders.a;
 			remoteRef = 66D913351C58D2FD00624175 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		66D9133D1C58D35B00624175 /* libRNShare.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNShare.a;
-			remoteRef = 66D9133C1C58D35B00624175 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
